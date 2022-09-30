@@ -50,7 +50,7 @@ namespace BackEnd_Football.Migrations
 
                     b.HasIndex("useCommentsID");
 
-                    b.ToTable("Comment");
+                    b.ToTable("Comment", (string)null);
                 });
 
             modelBuilder.Entity("BackEnd_Football.Models.News", b =>
@@ -80,7 +80,7 @@ namespace BackEnd_Football.Migrations
 
                     b.HasIndex("userNewsID");
 
-                    b.ToTable("News");
+                    b.ToTable("News", (string)null);
                 });
 
             modelBuilder.Entity("BackEnd_Football.Models.SqlRole", b =>
@@ -112,7 +112,7 @@ namespace BackEnd_Football.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("UserRole");
+                    b.ToTable("UserRole", (string)null);
                 });
 
             modelBuilder.Entity("BackEnd_Football.Models.SqlStadium", b =>
@@ -168,7 +168,7 @@ namespace BackEnd_Football.Migrations
 
                     b.HasIndex("userSystemID");
 
-                    b.ToTable("Stadium");
+                    b.ToTable("Stadium", (string)null);
                 });
 
             modelBuilder.Entity("BackEnd_Football.Models.SqlState", b =>
@@ -195,7 +195,7 @@ namespace BackEnd_Football.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Statement");
+                    b.ToTable("Statement", (string)null);
                 });
 
             modelBuilder.Entity("BackEnd_Football.Models.SqlTeam", b =>
@@ -243,7 +243,7 @@ namespace BackEnd_Football.Migrations
 
                     b.HasIndex("SqlUserID");
 
-                    b.ToTable("Team");
+                    b.ToTable("Team", (string)null);
                 });
 
             modelBuilder.Entity("BackEnd_Football.Models.SqlUser", b =>
@@ -290,7 +290,7 @@ namespace BackEnd_Football.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("User");
+                    b.ToTable("User", (string)null);
                 });
 
             modelBuilder.Entity("BackEnd_Football.Models.SqlUserSystem", b =>
@@ -339,7 +339,7 @@ namespace BackEnd_Football.Migrations
 
                     b.HasIndex("roleID");
 
-                    b.ToTable("UserSystem");
+                    b.ToTable("UserSystem", (string)null);
                 });
 
             modelBuilder.Entity("BackEnd_Football.Models.Comment", b =>
