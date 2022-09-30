@@ -24,7 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="APIs\" />
     <Folder Include="Controllers\" />
   </ItemGroup>
 
