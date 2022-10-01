@@ -25,7 +25,20 @@ namespace BackEnd_Football.APIs
                     context.sqlRoles!.Add(tmp);
                 }
 
-                
+                role = context.sqlRoles!.Where(s => s.isdeleted == false && s.code.CompareTo("manager") == 0).FirstOrDefault();
+                if (role == null)
+                {
+                    SqlRole tmp = new SqlRole();
+                    tmp.ID = DateTime.Now.Ticks;
+                    tmp.code = "manager";
+                    tmp.name = "manager";
+                    tmp.des = "manager";
+                    tmp.note = "manager";
+                    tmp.isdeleted = false;
+                    context.sqlRoles!.Add(tmp);
+                }
+
+
 
                 int rows = await context.SaveChangesAsync();
             }

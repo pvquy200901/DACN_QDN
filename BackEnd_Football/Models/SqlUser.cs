@@ -8,6 +8,7 @@ namespace BackEnd_Football.Models
     {
         [Key]
         public long ID { get; set; }
+        public string token { get; set; } = "";
         public string UID { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public string username { get; set; } = "";
