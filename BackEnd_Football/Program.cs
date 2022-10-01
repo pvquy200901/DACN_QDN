@@ -1,3 +1,4 @@
+using BackEnd_Football.APIs;
 using BackEnd_Football.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -5,6 +6,10 @@ namespace BackEnd_Football;
 
 public class Program
 {
+    //khai bao
+    public static MyUser api_user = new MyUser();
+    public static MyRole api_role = new MyRole();
+    public static MyUserSystem api_userSystem = new MyUserSystem();
     public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
@@ -59,8 +64,13 @@ public class Program
         app.MapControllers();
 
         app.MapGet("/", () => string.Format("", DateTime.Now));
+        //khoi tao
+        await api_role.initAsync();
+        await api_user.initAsync();
+        await api_userSystem.initAsync();
 
-     
         app.Run();
+        
+       
     }
 }
