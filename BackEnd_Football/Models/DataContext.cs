@@ -23,6 +23,7 @@ namespace BackEnd_Football.Models
         public DbSet<SqlUserSystem>? sqlUserSystems { get; set; }
         public DbSet<SqlTeam>? SqlTeams { get; set; }
         public DbSet<SqlState>? sqlStates { get; set; }
+        public DbSet<SqlOrderStadium>? sqlOrderStadium { get; set; }
 
         //public static string configSql = "Host=office.stvg.vn:50022;Database=db_stvg_luxjapancare;Username=stvg;Password=stvg";
         public static string configSql = "Host=localhost:5432;Database=db_DACN;Username=postgres;Password=postgres";

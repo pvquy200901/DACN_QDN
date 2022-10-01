@@ -11,8 +11,10 @@ namespace BackEnd_Football.Models
         public long id { get; set; }
         public string content { get; set; } = "";
         public string contact { get; set; } = "";
-        public SqlUser? userNews { get; set; }
         public List<string> images { get; set; } = new List<string>();
-
+        public SqlUser? user { get; set; }
+        public SqlUserSystem? manager { get; set; }
+        public List<Comment> comments { get; set; } = new List<Comment>();
+        public SqlState? state { get; set; }
     }
 }

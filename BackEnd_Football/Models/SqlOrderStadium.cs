@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BackEnd_Football.Models
 {
-    [Table("News")]
+    [Table("OrderStadium")]
     public class SqlOrderStadium
     {
 

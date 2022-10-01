@@ -16,6 +16,7 @@ namespace BackEnd_Football.Models
         public string address { get; set; } = "";
         public List<string> imagesTeam { get; set; } = new List<string>();
         public string des { get; set; } = "";
+        public List<SqlUser>? user { get; set; }
 
     }
 }

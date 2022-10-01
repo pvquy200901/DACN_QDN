@@ -17,6 +17,5 @@ namespace BackEnd_Football.Models
         public bool IsDeleted { get; set; } = false;
         public string Phone { get; set; } = string.Empty;
         public bool ChucVu { get; set; } = true;
-        public List<SqlTeam>? team { get; set; } 
     }
 }
