@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿        using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BackEnd_Football.Models
@@ -18,5 +18,6 @@ namespace BackEnd_Football.Models
         public bool IsDeleted { get; set; } = false;
         public string Phone { get; set; } = string.Empty;
         public bool ChucVu { get; set; } = true;
+        public DateTime birthday { get; set; }
     }
 }
