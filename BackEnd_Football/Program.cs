@@ -53,7 +53,7 @@ public class Program
             IServiceProvider services = scope.ServiceProvider;
             DataContext datacontext = services.GetRequiredService<DataContext>();
             datacontext.Database.EnsureCreated();
-            datacontext.Database.MigrateAsync();
+            await datacontext.Database.MigrateAsync();
         }
 
         app.UseCors("HTTPSystem");

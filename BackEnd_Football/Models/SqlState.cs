@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BackEnd_Football.Models
 {
-    [Table("Statement")]
+    [Table("Statements")]
     public class SqlState
     {
         [Key]
