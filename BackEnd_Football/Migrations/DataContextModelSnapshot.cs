@@ -255,7 +255,7 @@ namespace BackEnd_Football.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Statement");
+                    b.ToTable("Statements");
                 });
 
             modelBuilder.Entity("BackEnd_Football.Models.SqlTeam", b =>
@@ -337,6 +337,9 @@ namespace BackEnd_Football.Migrations
                     b.Property<string>("UID")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("birthday")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("password")
                         .IsRequired()

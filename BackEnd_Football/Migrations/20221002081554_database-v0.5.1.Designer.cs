@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BackEnd_Football.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20221001030312_database-v0.4")]
-    partial class databasev04
+    [Migration("20221002081554_database-v0.5.1")]
+    partial class databasev051
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -257,7 +257,7 @@ namespace BackEnd_Football.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Statement");
+                    b.ToTable("Statements");
                 });
 
             modelBuilder.Entity("BackEnd_Football.Models.SqlTeam", b =>
@@ -340,7 +340,14 @@ namespace BackEnd_Football.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTime>("birthday")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("password")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("token")
                         .IsRequired()
                         .HasColumnType("text");
 
