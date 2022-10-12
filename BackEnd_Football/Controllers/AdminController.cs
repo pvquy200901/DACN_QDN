@@ -1,12 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BackEnd_Football.Controllers
 {
+    [Route("api/[controller]")]
     [ApiController]
-    [Route("[controller]")]
-    public class AdminController : Controller
+    public class AdminController : ControllerBase
     {
-
         private readonly ILogger<AdminController> _logger;
 
         public AdminController(ILogger<AdminController> logger)
@@ -58,8 +58,8 @@ namespace BackEnd_Football.Controllers
             {
                 return Unauthorized();
             }
-        }   
-        
+        }
+
         [HttpPut]
         [Route("editTeam")]
         public async Task<IActionResult> editTeamAsync([FromHeader] string token, ItemHttpTeam team)
@@ -81,7 +81,7 @@ namespace BackEnd_Football.Controllers
             {
                 return Unauthorized();
             }
-        }  
+        }
 
         [HttpDelete]
         [Route("deleteTeam")]
@@ -104,7 +104,7 @@ namespace BackEnd_Football.Controllers
             {
                 return Unauthorized();
             }
-        }  
+        }
 
         [HttpGet]
         [Route("getInfoTeam")]
@@ -235,6 +235,6 @@ namespace BackEnd_Football.Controllers
                 return Unauthorized();
             }
         }
-        //=============================================================================================================================================================================
+//=============================================================================================================================================================================
     }
 }
