@@ -9,6 +9,7 @@ public class Program
     //khai bao
     public static MyUser api_user = new MyUser();
     public static MyRole api_role = new MyRole();
+    public static MyFile api_myFile = new MyFile();
     public static MyUserSystem api_userSystem = new MyUserSystem();
     public static async Task Main(string[] args)
     {

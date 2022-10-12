@@ -69,5 +69,28 @@ namespace BackEnd_Football.APIs
                 }
             }
         }
+
+        public class InfoUser
+        {
+            public string user { get; set; } = "";
+            public string token { get; set; } = "";
+          
+        }
+
+        public InfoUser login(string username, string password)
+        {
+            using (DataContext context = new DataContext())
+            {
+                SqlUser? user = context.users!.Where(s => s.IsDeleted == false && s.username.CompareTo(username) == 0 && s.password.CompareTo(password) == 0).AsNoTracking().FirstOrDefault();
+                if (user == null)
+                {
+                    return new InfoUser();
+                }
+                InfoUser info = new InfoUser();
+                info.user = user.Name;
+                info.token = user.token;
+                return info;
+            }
+        }
     }
 }
