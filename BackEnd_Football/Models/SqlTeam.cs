@@ -14,9 +14,11 @@ namespace BackEnd_Football.Models
         public DateTime createdTime { get; set; }
         public int quantity { get; set; } = 0;
         public string address { get; set; } = "";
+        public string PhoneNumber { get; set; } = "";
         public List<string> imagesTeam { get; set; } = new List<string>();
         public string des { get; set; } = "";
         public List<SqlUser>? user { get; set; }
+        public bool isdeleted { get; set; } = false;
 
     }
 }

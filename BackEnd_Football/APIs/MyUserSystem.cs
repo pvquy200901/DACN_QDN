@@ -339,6 +339,45 @@ namespace BackEnd_Football.APIs
                 return items;
             }
         }
+        public long checkAdmin(string token)
+        {
+            using (DataContext context = new DataContext())
+            {
+                SqlUserSystem? user = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).Include(s => s.role).FirstOrDefault();
+                if (user == null)
+                {
+                    return -1;
+                }
+                if (user.role == null)
+                {
+                    return -1;
+                }
+                if (user.role.code.CompareTo("admin") == 0 || user.role.code.CompareTo("manager") == 0)
+                {
+                    return user.ID;
+                }
+                else
+                {
+                    return -1;
+                }
+            }
+        }
+
+        public long checkUserSystem(string token)
+        {
+            using (DataContext context = new DataContext())
+            {
+                SqlUserSystem? user = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).Include(s => s.role).FirstOrDefault();
+                if (user == null)
+                {
+                    return -1;
+                }
+                else
+                {
+                    return user.ID;
+                }
+            }
+        }
 
     }
 }
