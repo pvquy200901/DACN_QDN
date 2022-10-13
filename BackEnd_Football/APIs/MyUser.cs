@@ -1,5 +1,7 @@
 ﻿using BackEnd_Football.Models;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
+
 namespace BackEnd_Football.APIs
 {
     public class MyUser
@@ -74,7 +76,8 @@ namespace BackEnd_Football.APIs
         {
             public string user { get; set; } = "";
             public string token { get; set; } = "";
-          
+            public string role { get; set; } = "";
+
         }
 
         public InfoUser login(string username, string password)

@@ -51,9 +51,9 @@ namespace BackEnd_Football.APIs
             }
         }
 
-        public async Task<bool> createAsync(string name, string shortName, string phone, string des)
+        public async Task<bool> createAsync(string name, string shortName, int quantity , string address,string phone, string des)
         {
-            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(shortName))
+            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(shortName) || quantity == 0 || string.IsNullOrEmpty(address) || string.IsNullOrEmpty(phone) || string.IsNullOrEmpty(des))
             {
                 return false;
             }
@@ -85,9 +85,9 @@ namespace BackEnd_Football.APIs
             }
         }
 
-        public async Task<bool> editAsync(string name, string shortName, string phone, string des)
+        public async Task<bool> editAsync(string name, string shortName, int quantity, string address, string phone, string des)
         {
-            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(shortName))
+            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(shortName) || quantity == 0 || string.IsNullOrEmpty(address) || string.IsNullOrEmpty(phone) || string.IsNullOrEmpty(des))
             {
                 return false;
             }

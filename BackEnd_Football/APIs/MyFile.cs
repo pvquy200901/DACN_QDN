@@ -14,6 +14,37 @@ namespace BackEnd_Football.APIs
             return String.Concat(key.Select(x => ((int)x).ToString("x")));
         }
 
+
+        public async Task<bool> UploadFile(IFormFile file, string lang)
+        {
+            string path = "";
+            string fileName = "lang_" + lang + ".txt";
+            try
+            {
+                if (file.Length > 0)
+                {
+                    path = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "UploadedFiles"));
+                    if (!Directory.Exists(path))
+                    {
+                        Directory.CreateDirectory(path);
+                    }
+                    using (var fileStream = new FileStream(Path.Combine(path, fileName), FileMode.Create))
+                    {
+                        await file.CopyToAsync(fileStream);
+                    }
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("File Copy Failed", ex);
+            }
+        }
+
         public async Task<string> saveFileAsync(string file, byte[] data)
         {
             using (DataContext context = new DataContext())

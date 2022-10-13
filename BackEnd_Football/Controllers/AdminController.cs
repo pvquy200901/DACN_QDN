@@ -32,6 +32,8 @@ namespace BackEnd_Football.Controllers
             public string phone { get; set; } = "";
             public string logo { get; set; } = "";
             public string des { get; set; } = "";
+            public string address { get; set; } = "";
+            public int quantity { get; set; }
             public List<string> imageTeam { get; set; } = new List<string>();
         }
 
@@ -44,7 +46,7 @@ namespace BackEnd_Football.Controllers
             long id = Program.api_userSystem.checkAdmin(token);
             if (id >= 0)
             {
-                bool flag = await Program.api_myTeam.createAsync(team.name, team.shortName, team.phone, team.des);
+                bool flag = await Program.api_myTeam.createAsync(team.name, team.shortName, team.quantity, team.address ,team.phone, team.des);
                 if (flag)
                 {
                     return Ok();
@@ -67,7 +69,7 @@ namespace BackEnd_Football.Controllers
             long id = Program.api_userSystem.checkAdmin(token);
             if (id >= 0)
             {
-                bool flag = await Program.api_myTeam.createAsync(team.name, team.shortName, team.phone, team.des);
+                bool flag = await Program.api_myTeam.createAsync(team.name, team.shortName, team.quantity, team.address, team.phone, team.des);
                 if (flag)
                 {
                     return Ok();
@@ -90,7 +92,7 @@ namespace BackEnd_Football.Controllers
             long id = Program.api_userSystem.checkAdmin(token);
             if (id >= 0)
             {
-                bool flag = await Program.api_myTeam.createAsync(team.name, team.shortName, team.phone, team.des);
+                bool flag = await Program.api_myTeam.createAsync(team.name, team.shortName, team.quantity, team.address, team.phone, team.des);
                 if (flag)
                 {
                     return Ok();
@@ -235,6 +237,8 @@ namespace BackEnd_Football.Controllers
                 return Unauthorized();
             }
         }
-//=============================================================================================================================================================================
+        //=============================================================================================================================================================================
+
+      
     }
 }
