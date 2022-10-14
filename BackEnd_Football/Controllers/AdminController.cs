@@ -39,74 +39,74 @@ namespace BackEnd_Football.Controllers
 
         //Quản lí team
 
-        [HttpPost]
-        [Route("createTeam")]
-        public async Task<IActionResult> createTeamAsync([FromHeader] string token, ItemHttpTeam team)
-        {
-            long id = Program.api_userSystem.checkAdmin(token);
-            if (id >= 0)
-            {
-                bool flag = await Program.api_myTeam.createAsync(team.name, team.shortName, team.quantity, team.address ,team.phone, team.des);
-                if (flag)
-                {
-                    return Ok();
-                }
-                else
-                {
-                    return BadRequest();
-                }
-            }
-            else
-            {
-                return Unauthorized();
-            }
-        }
+        //[HttpPost]
+        //[Route("createTeam")]
+        //public async Task<IActionResult> createTeamAsync([FromHeader] string token, ItemHttpTeam team)
+        //{
+        //    long id = Program.api_userSystem.checkAdmin(token);
+        //    if (id >= 0)
+        //    {
+        //        bool flag = await Program.api_myTeam.createAsync(team.name, team.shortName, team.quantity, team.address ,team.phone, team.des);
+        //        if (flag)
+        //        {
+        //            return Ok();
+        //        }
+        //        else
+        //        {
+        //            return BadRequest();
+        //        }
+        //    }
+        //    else
+        //    {
+        //        return Unauthorized();
+        //    }
+        //}
 
-        [HttpPut]
-        [Route("editTeam")]
-        public async Task<IActionResult> editTeamAsync([FromHeader] string token, ItemHttpTeam team)
-        {
-            long id = Program.api_userSystem.checkAdmin(token);
-            if (id >= 0)
-            {
-                bool flag = await Program.api_myTeam.createAsync(team.name, team.shortName, team.quantity, team.address, team.phone, team.des);
-                if (flag)
-                {
-                    return Ok();
-                }
-                else
-                {
-                    return BadRequest();
-                }
-            }
-            else
-            {
-                return Unauthorized();
-            }
-        }
+        //[HttpPut]
+        //[Route("editTeam")]
+        //public async Task<IActionResult> editTeamAsync([FromHeader] string token, ItemHttpTeam team)
+        //{
+        //    long id = Program.api_userSystem.checkAdmin(token);
+        //    if (id >= 0)
+        //    {
+        //        bool flag = await Program.api_myTeam.createAsync(team.name, team.shortName, team.quantity, team.address, team.phone, team.des);
+        //        if (flag)
+        //        {
+        //            return Ok();
+        //        }
+        //        else
+        //        {
+        //            return BadRequest();
+        //        }
+        //    }
+        //    else
+        //    {
+        //        return Unauthorized();
+        //    }
+        //}
 
-        [HttpDelete]
-        [Route("deleteTeam")]
-        public async Task<IActionResult> deleteTeamAsync([FromHeader] string token, ItemHttpTeam team)
-        {
-            long id = Program.api_userSystem.checkAdmin(token);
-            if (id >= 0)
-            {
-                bool flag = await Program.api_myTeam.createAsync(team.name, team.shortName, team.quantity, team.address, team.phone, team.des);
-                if (flag)
-                {
-                    return Ok();
-                }
-                else
-                {
-                    return BadRequest();
-                }
-            }
-            else
-            {
-                return Unauthorized();
-            }
-        }
+        //[HttpDelete]
+        //[Route("deleteTeam")]
+        //public async Task<IActionResult> deleteTeamAsync([FromHeader] string token, ItemHttpTeam team)
+        //{
+        //    long id = Program.api_userSystem.checkAdmin(token);
+        //    if (id >= 0)
+        //    {
+        //        bool flag = await Program.api_myTeam.createAsync(team.name, team.shortName, team.quantity, team.address, team.phone, team.des);
+        //        if (flag)
+        //        {
+        //            return Ok();
+        //        }
+        //        else
+        //        {
+        //            return BadRequest();
+        //        }
+        //    }
+        //    else
+        //    {
+        //        return Unauthorized();
+        //    }
+        //}
 
         [HttpGet]
         [Route("getInfoTeam")]

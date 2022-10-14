@@ -51,40 +51,45 @@ namespace BackEnd_Football.APIs
             }
         }
 
-        public async Task<bool> createAsync(string name, string shortName, int quantity , string address,string phone, string des)
-        {
-            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(shortName) || quantity == 0 || string.IsNullOrEmpty(address) || string.IsNullOrEmpty(phone) || string.IsNullOrEmpty(des))
-            {
-                return false;
-            }
-            using (DataContext context = new DataContext())
-            {
-                SqlTeam? team = context.SqlTeams!.Where(s => s.isdeleted == false && s.name.CompareTo(name) == 0).FirstOrDefault();
-                if (team != null)
-                {
-                    return false;
-                }
-                team = new SqlTeam();
-                team.id = DateTime.Now.Ticks;
-                team.name = name;
-                team.shortName = shortName;
-                team.PhoneNumber = phone;
-                team.des = des;
-                team.isdeleted = false;
-                team.quantity = quantity;
-                context.SqlTeams!.Add(team);
+        //public async Task<bool> createAsync(string token,string name, string shortName, int quantity , string address,string phone, string des)
+        //{
+        //    if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(name) || string.IsNullOrEmpty(shortName) || quantity == 0 || string.IsNullOrEmpty(address) || string.IsNullOrEmpty(phone) || string.IsNullOrEmpty(des))
+        //    {
+        //        return false;
+        //    }
+        //    using (DataContext context = new DataContext())
+        //    {
+        //        SqlUser? m_user = context.users!.Where(s => s.IsDeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+        //        if(m_user == null)
+        //        {
+        //            return false;
+        //        }
+        //        SqlTeam? team = context.SqlTeams!.Where(s => s.isdeleted == false && s.name.CompareTo(name) == 0).FirstOrDefault();
+        //        if (team != null)
+        //        {
+        //            return false;
+        //        }
+        //        team = new SqlTeam();
+        //        team.id = DateTime.Now.Ticks;
+        //        team.name = name;
+        //        team.shortName = shortName;
+        //        team.PhoneNumber = phone;
+        //        team.des = des;
+        //        team.isdeleted = false;
+        //        team.quantity = quantity;
+        //        context.SqlTeams!.Add(team);
 
-                int rows = await context.SaveChangesAsync();
-                if (rows > 0)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-        }
+        //        int rows = await context.SaveChangesAsync();
+        //        if (rows > 0)
+        //        {
+        //            return true;
+        //        }
+        //        else
+        //        {
+        //            return false;
+        //        }
+        //    }
+        //}
 
         public async Task<bool> editAsync(string name, string shortName, int quantity, string address, string phone, string des)
         {

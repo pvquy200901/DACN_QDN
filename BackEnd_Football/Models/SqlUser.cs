@@ -19,5 +19,6 @@ namespace BackEnd_Football.Models
         public string Phone { get; set; } = string.Empty;
         public bool ChucVu { get; set; } = true;
         public DateTime birthday { get; set; }
+        public SqlTeam? SqlTeam { get; set; }
     }
 }

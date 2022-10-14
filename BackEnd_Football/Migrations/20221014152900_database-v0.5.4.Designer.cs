@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using BackEnd_Football.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BackEnd_Football.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20221014152900_database-v0.5.4")]
+    partial class databasev054
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -50,7 +52,7 @@ namespace BackEnd_Football.Migrations
 
                     b.HasIndex("useCommentsID");
 
-                    b.ToTable("Comment", (string)null);
+                    b.ToTable("Comment");
                 });
 
             modelBuilder.Entity("BackEnd_Football.Models.News", b =>
@@ -90,7 +92,7 @@ namespace BackEnd_Football.Migrations
 
                     b.HasIndex("userID");
 
-                    b.ToTable("News", (string)null);
+                    b.ToTable("News");
                 });
 
             modelBuilder.Entity("BackEnd_Football.Models.SqlFile", b =>
@@ -118,7 +120,7 @@ namespace BackEnd_Football.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("File", (string)null);
+                    b.ToTable("File");
                 });
 
             modelBuilder.Entity("BackEnd_Football.Models.SqlOrderStadium", b =>
@@ -173,7 +175,7 @@ namespace BackEnd_Football.Migrations
 
                     b.HasIndex("userOrderID");
 
-                    b.ToTable("OrderStadium", (string)null);
+                    b.ToTable("OrderStadium");
                 });
 
             modelBuilder.Entity("BackEnd_Football.Models.SqlRole", b =>
@@ -205,7 +207,7 @@ namespace BackEnd_Football.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("UserRole", (string)null);
+                    b.ToTable("UserRole");
                 });
 
             modelBuilder.Entity("BackEnd_Football.Models.SqlStadium", b =>
@@ -256,7 +258,7 @@ namespace BackEnd_Football.Migrations
 
                     b.HasIndex("userSystemID");
 
-                    b.ToTable("Stadium", (string)null);
+                    b.ToTable("Stadium");
                 });
 
             modelBuilder.Entity("BackEnd_Football.Models.SqlState", b =>
@@ -283,7 +285,7 @@ namespace BackEnd_Football.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Statements", (string)null);
+                    b.ToTable("Statements");
                 });
 
             modelBuilder.Entity("BackEnd_Football.Models.SqlTeam", b =>
@@ -338,7 +340,7 @@ namespace BackEnd_Football.Migrations
 
                     b.HasIndex("userCreateTeamID");
 
-                    b.ToTable("Team", (string)null);
+                    b.ToTable("Team");
                 });
 
             modelBuilder.Entity("BackEnd_Football.Models.SqlUser", b =>
@@ -397,7 +399,7 @@ namespace BackEnd_Football.Migrations
 
                     b.HasIndex("SqlTeamid");
 
-                    b.ToTable("User", (string)null);
+                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("BackEnd_Football.Models.SqlUserSystem", b =>
@@ -446,7 +448,7 @@ namespace BackEnd_Football.Migrations
 
                     b.HasIndex("roleID");
 
-                    b.ToTable("UserSystem", (string)null);
+                    b.ToTable("UserSystem");
                 });
 
             modelBuilder.Entity("BackEnd_Football.Models.Comment", b =>

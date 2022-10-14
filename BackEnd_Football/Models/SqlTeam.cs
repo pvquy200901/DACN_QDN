@@ -19,6 +19,7 @@ namespace BackEnd_Football.Models
         public string des { get; set; } = "";
         public List<SqlUser>? user { get; set; }
         public bool isdeleted { get; set; } = false;
+        public SqlUser? userCreateTeam { get; set; }
 
     }
 }

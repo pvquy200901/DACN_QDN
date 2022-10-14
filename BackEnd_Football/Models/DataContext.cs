@@ -36,7 +36,7 @@ namespace BackEnd_Football.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-          
+            modelBuilder.Entity<SqlUser>().HasOne<SqlTeam>(s => s.SqlTeam).WithMany(s => s.user);
         }
     }
 }
