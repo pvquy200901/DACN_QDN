@@ -71,6 +71,7 @@ namespace BackEnd_Football.APIs
                 team.PhoneNumber = phone;
                 team.des = des;
                 team.isdeleted = false;
+                team.quantity = quantity;
                 context.SqlTeams!.Add(team);
 
                 int rows = await context.SaveChangesAsync();
@@ -105,6 +106,7 @@ namespace BackEnd_Football.APIs
                 team.PhoneNumber = phone;
                 team.des = des;
                 team.isdeleted = false;
+                team.quantity = quantity;
                 context.SqlTeams!.Add(team);
 
                 int rows = await context.SaveChangesAsync();
