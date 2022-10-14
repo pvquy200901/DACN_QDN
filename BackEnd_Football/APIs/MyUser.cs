@@ -76,7 +76,7 @@ namespace BackEnd_Football.APIs
         {
             public string user { get; set; } = "";
             public string token { get; set; } = "";
-            public string role { get; set; } = "";
+            public bool ChucVu { get; set; } = true;
 
         }
 
@@ -92,7 +92,54 @@ namespace BackEnd_Football.APIs
                 InfoUser info = new InfoUser();
                 info.user = user.Name;
                 info.token = user.token;
+                info.ChucVu = user.ChucVu;
                 return info;
+            }
+        }
+
+        public class registerUser
+        {
+            public string name { get; set; } = "";
+            public string username { get; set; } = "";
+            public string password { get; set; } = "";
+            public string email { get; set; } = "";
+
+        }
+
+        public async Task<bool> registerUserAsync(string i_user, string username, string password,string email)
+        {
+            if ( string.IsNullOrEmpty(i_user) || string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(email))
+            {
+                return false;
+            }
+            using (DataContext context = new DataContext())
+            {
+                SqlUser? user = context.users!.Where(s => s.IsDeleted == false && s.username.CompareTo(username) == 0).FirstOrDefault();
+                if (user != null)
+                {
+                    return false;
+                }
+              
+                SqlUser teamp = new SqlUser();
+                teamp.ID = DateTime.Now.Ticks;
+                teamp.Name = i_user;
+                teamp.username = username;
+                teamp.password = password;
+                teamp.Email = email;
+                teamp.ChucVu = false;
+                teamp.token = createToken();
+
+                context.users!.Add(teamp);
+
+                int rows = await context.SaveChangesAsync();
+                if (rows > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
         }
     }
