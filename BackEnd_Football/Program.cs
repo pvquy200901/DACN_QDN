@@ -11,6 +11,7 @@ public class Program
     public static MyRole api_role = new MyRole();
     public static MyFile api_myFile = new MyFile();
     public static MyTeam api_myTeam = new MyTeam();
+    public static MyStadium api_myStadium = new MyStadium();
     public static MyUserSystem api_userSystem = new MyUserSystem();
     public static async Task Main(string[] args)
     {
@@ -71,6 +72,7 @@ public class Program
         await api_user.initAsync();
         await api_userSystem.initAsync();
         await api_myTeam.initAsync();
+        await api_myStadium.initAsync();
 
         app.Run();
         

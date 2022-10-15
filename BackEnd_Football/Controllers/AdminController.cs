@@ -201,7 +201,7 @@ namespace BackEnd_Football.Controllers
         }
 
         [HttpDelete]
-        [Route("removeImageEmployee")]
+        [Route("removeImageTeam")]
         public async Task<IActionResult> removeImageTeamAsync([FromHeader] string token, string team, string code)
         {
             long id = Program.api_userSystem.checkAdmin(token);
@@ -238,7 +238,164 @@ namespace BackEnd_Football.Controllers
             }
         }
         //=============================================================================================================================================================================
+        //==================Quản lí Sân============================================
+        public class ItemHttpStadium
+        {
+            public string name { get; set; } = "";
+            public string address { get; set; } = "";
+            public string contact { get; set; } = "";
+            public int price { get; set; }
+        }
 
-      
+        [HttpPost]
+        [Route("createStadium")]
+        public async Task<IActionResult> createStadiumAsync([FromHeader] string token, ItemHttpStadium stadium)
+        {
+            long id = Program.api_userSystem.checkAdmin(token);
+            if (id >= 0)
+            {
+                bool flag = await Program.api_myStadium.createAsync(stadium.name, stadium.address, stadium.contact, stadium.price);
+                if (flag)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        [HttpPost]
+        [Route("editStadium")]
+        public async Task<IActionResult> editStadiumAsync([FromHeader] string token, ItemHttpStadium stadium)
+        {
+            long id = Program.api_userSystem.checkAdmin(token);
+            if (id >= 0)
+            {
+                bool flag = await Program.api_myStadium.editAsync(stadium.name, stadium.address, stadium.contact, stadium.price);
+                if (flag)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        [HttpDelete]
+        [Route("deleteStadium")]
+        public async Task<IActionResult> deleteStadiumAsync([FromHeader] string token, string stadium)
+        {
+            long id = Program.api_userSystem.checkAdmin(token);
+            if (id >= 0)
+            {
+                bool flag = await Program.api_myStadium.deleteAsync(stadium);
+                if (flag)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        [HttpGet]
+        [Route("getInfoStadium")]
+        public IActionResult getInfoStadium([FromHeader] string token, string stadium)
+        {
+            long id = Program.api_userSystem.checkUserSystem(token);
+            if (id >= 0)
+            {
+                return Ok(Program.api_myStadium.getInfoTeam(token, stadium));
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+
+        [HttpPut]
+        [Route("addImageStadium")]
+        public async Task<IActionResult> addImageStadiumAsync([FromHeader] string token, string stadium, IFormFile image)
+        {
+            long id = Program.api_userSystem.checkAdmin(token);
+            if (id >= 0)
+            {
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    image.CopyTo(ms);
+                    string code = await Program.api_myStadium.addImageStadiumAsync(stadium, ms.ToArray());
+                    if (string.IsNullOrEmpty(code))
+                    {
+                        return BadRequest();
+                    }
+                    else
+                    {
+                        return Ok(code);
+                    }
+                }
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        [HttpDelete]
+        [Route("removeImageStadium")]
+        public async Task<IActionResult> removeImageStadiumAsync([FromHeader] string token, string stadium, string code)
+        {
+            long id = Program.api_userSystem.checkAdmin(token);
+            if (id >= 0)
+            {
+                bool flag = await Program.api_myStadium.removeImageStadiumAsync(stadium, code);
+                if (flag)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        [HttpGet]
+        [Route("listStadium")]
+        public IActionResult listStadium([FromHeader] string token)
+        {
+            long id = Program.api_userSystem.checkUserSystem(token);
+            if (id >= 0)
+            {
+                return Ok(Program.api_myStadium.getList());
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
     }
 }

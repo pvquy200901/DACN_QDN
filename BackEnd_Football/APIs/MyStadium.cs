@@ -11,44 +11,272 @@ namespace BackEnd_Football.APIs
         {
             using (DataContext context = new DataContext())
             {
-               /* SqlStadium? stadium = context.sqlStadium!.Where(s => s.name.CompareTo("Stadium 1") == 0).FirstOrDefault();
+                SqlStadium? stadium = context.sqlStadium!.Where(s => s.name.CompareTo("Stadium 1") == 0).FirstOrDefault();
                 if (stadium == null)
                 {
                     SqlStadium item = new SqlStadium();
                     item.id = DateTime.Now.Ticks;
                     item.name = "Stadium 1";
-                    item.address = "TT1";
-                    item.contact = "";
-                    item.createdTime = DateTime.Now.ToUniversalTime();
-                    item.quantity = 15;
                     item.address = "Thu Duc, Tp. Ho Chi Minh";
-                    item.iamg = new List<string>();
-                    item.des = "";
-                    item.PhoneNumber = "0336789234";
-                    item.isdeleted = false;
-                    context.SqlTeams!.Add(item);
+                    item.contact = "0336789234";
+                    item.isDelete = false;
+                    item.isFinish = false;
+                    item.price = 350000;
+                    item.createdTime = DateTime.Now.ToUniversalTime();
+                    context.sqlStadium!.Add(item);
                 }
 
-                team = context.SqlTeams!.Where(s => s.name.CompareTo("TestTeam2") == 0).FirstOrDefault();
-                if (team == null)
+                stadium = context.sqlStadium!.Where(s => s.name.CompareTo("Stadium 2") == 0).FirstOrDefault();
+                if (stadium == null)
                 {
-                    SqlTeam item = new SqlTeam();
+                    SqlStadium item = new SqlStadium();
                     item.id = DateTime.Now.Ticks;
-                    item.name = "TestTeam2";
-                    item.shortName = "TT2";
-                    item.logo = "";
+                    item.name = "Stadium 2";
+                    item.address = "Thu Duc, Tp. Ho Chi Minh";
+                    item.contact = "0336789234";
+                    item.isDelete = false;
+                    item.isFinish = false;
+                    item.price = 350000;
                     item.createdTime = DateTime.Now.ToUniversalTime();
-                    item.quantity = 15;
-                    item.address = "Binh Thanh, Tp. Ho Chi Minh";
-                    item.imagesTeam = new List<string>();
-                    item.des = "";
-                    item.PhoneNumber = "0336789123";
-                    item.isdeleted = false;
-                    context.SqlTeams!.Add(item);
-                }*/
+                    context.sqlStadium!.Add(item);
+                }
 
                 int rows = await context.SaveChangesAsync();
             }
         }
+
+        public async Task<bool> createAsync(string name, string address, string contact, int price)
+        {
+            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(address) || string.IsNullOrEmpty(contact))
+            {
+                return false;
+            }
+            using (DataContext context = new DataContext())
+            {
+                SqlStadium? stadium = context.sqlStadium!.Where(s => s.isDelete == false && s.name.CompareTo(name) == 0).FirstOrDefault();
+                if (stadium != null)
+                {
+                    return false;
+                }
+                stadium = new SqlStadium();
+                stadium.id = DateTime.Now.Ticks;
+                stadium.name = name;
+                stadium.address = address;
+                stadium.contact = contact;
+                stadium.price = price;
+                stadium.createdTime = DateTime.Now.ToUniversalTime();   
+                context.sqlStadium!.Add(stadium);
+
+                int rows = await context.SaveChangesAsync();
+                if (rows > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
+        public async Task<bool> editAsync(string name, string address, string contact, int price)
+        {
+            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(address) || string.IsNullOrEmpty(contact))
+            {
+                return false;
+            }
+            using (DataContext context = new DataContext())
+            {
+                SqlStadium? stadium = context.sqlStadium!.Where(s => s.isDelete == false && s.name.CompareTo(name) == 0).FirstOrDefault();
+                if (stadium != null)
+                {
+                    return false;
+                }
+                stadium = new SqlStadium();
+                stadium.id = DateTime.Now.Ticks;
+                stadium.name = name;
+                stadium.address = address;
+                stadium.contact = contact;
+                stadium.price = price;
+                context.sqlStadium!.Add(stadium);
+
+                int rows = await context.SaveChangesAsync();
+                if (rows > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
+        public async Task<bool> deleteAsync(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return false;
+            }
+            using (DataContext context = new DataContext())
+            {
+                SqlStadium? team = context.sqlStadium!.Where(s => s.isDelete == false && s.name.CompareTo(name) == 0).FirstOrDefault();
+                if (team == null)
+                {
+                    return false;
+                }
+                team.isDelete = true;
+
+                int rows = await context.SaveChangesAsync();
+                if (rows > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
+        public async Task<string> addImageStadiumAsync(string name, byte[] file)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return "";
+            }
+            using (DataContext context = new DataContext())
+            {
+                SqlStadium? team = context.sqlStadium!.Where(s => s.isDelete == false && s.name.CompareTo(name) == 0).FirstOrDefault();
+                if (team == null)
+                {
+                    return "";
+                }
+
+                string code = await Program.api_myFile.saveFileAsync(string.Format("{0}.jpg", DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")), file);
+                if (string.IsNullOrEmpty(code))
+                {
+                    return "";
+                }
+
+                if (team.images == null)
+                {
+                    team.images = new List<string>();
+                }
+                team.images.Add(code);
+
+                int rows = await context.SaveChangesAsync();
+                if (rows > 0)
+                {
+                    return code;
+                }
+                else
+                {
+                    return "";
+                }
+            }
+        }
+
+        public async Task<bool> removeImageStadiumAsync(string name, string code)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return false;
+            }
+            using (DataContext context = new DataContext())
+            {
+                SqlStadium? team = context.sqlStadium!.Where(s => s.isDelete == false && s.name.CompareTo(name) == 0).FirstOrDefault();
+                if (team == null)
+                {
+                    return false;
+                }
+
+                if (team.images == null)
+                {
+                    return false;
+                }
+
+                bool flag = team.images!.Remove(code);
+
+                if (flag == false)
+                {
+                    return false;
+                }
+                           
+                int rows = await context.SaveChangesAsync();
+                if (rows > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
+        public class ItemStadium
+        {
+            public string name { get; set; } = "";
+            public string address { get; set; } = "";
+            public string contact { get; set; } = "";
+            public int price { get; set; }
+            public List<string> images { get; set; } = new List<string>();
+        }
+
+        public List<ItemStadium> getList()
+        {
+            using (DataContext context = new DataContext())
+            {
+                List<ItemStadium> items = new List<ItemStadium>();
+                List<SqlStadium> stadiums = context.sqlStadium!.Where(s => s.isDelete == false).ToList();
+                foreach (SqlStadium stadium in stadiums)
+                {
+                    ItemStadium item = new ItemStadium();
+                    item.name = stadium.name;
+                    item.address = stadium.address;
+                    item.contact = stadium.contact;
+                    item.price = stadium.price;
+                    if (stadium.images != null)
+                    {
+                        item.images.AddRange(stadium.images);
+                    }
+                    items.Add(item);
+                }
+                return items;
+            }
+        }
+
+        public ItemStadium getInfoTeam(string token, string code)
+        {
+            using (DataContext context = new DataContext())
+            {
+                SqlUserSystem? user = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).Include(s => s.role).FirstOrDefault();
+                if (user == null)
+                {
+                    return new ItemStadium();
+                }
+                //if (user.role!.code.CompareTo("admin") != 0)
+                //{
+                //    return new ItemEmployee();
+                //}
+                SqlStadium? emp = context.sqlStadium!.Where(s => s.isDelete == false && s.name.CompareTo(code) == 0).FirstOrDefault();
+                if (emp == null)
+                {
+                    return new ItemStadium();
+                }
+                ItemStadium item = new ItemStadium();
+                item.name = emp.name;
+                item.address = emp.address;
+                item.contact = emp.contact;
+                item.price = emp.price;
+                if (emp.images != null)
+                {
+                    item.images.AddRange(emp.images);
+                }
+
+                return item;
+            }
+        }
     }
-}
+ }
