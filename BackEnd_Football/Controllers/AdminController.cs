@@ -34,7 +34,6 @@ namespace BackEnd_Football.Controllers
             public string des { get; set; } = "";
             public string address { get; set; } = "";
             public int quantity { get; set; }
-            public DateTime createdTime { get; set; }
             public List<string> imageTeam { get; set; } = new List<string>();
         }
 
@@ -47,7 +46,7 @@ namespace BackEnd_Football.Controllers
             long id = Program.api_userSystem.checkAdmin(token);
             if (id >= 0)
             {
-                bool flag = await Program.api_myTeam.createAsync(team.name, team.shortName, team.quantity, team.address ,team.phone, team.des, team.createdTime);
+                bool flag = await Program.api_myTeam.createAsync(team.name, team.shortName, team.quantity, team.address ,team.phone, team.des);
                 if (flag)
                 {
                     return Ok();
@@ -202,7 +201,7 @@ namespace BackEnd_Football.Controllers
         }
 
         [HttpDelete]
-        [Route("removeImageTeam")]
+        [Route("removeImageEmployee")]
         public async Task<IActionResult> removeImageTeamAsync([FromHeader] string token, string team, string code)
         {
             long id = Program.api_userSystem.checkAdmin(token);
@@ -226,7 +225,7 @@ namespace BackEnd_Football.Controllers
 
         [HttpGet]
         [Route("listTeam")]
-        public IActionResult listTeam([FromHeader] string token)
+        public IActionResult listEmployee([FromHeader] string token)
         {
             long id = Program.api_userSystem.checkUserSystem(token);
             if (id >= 0)
