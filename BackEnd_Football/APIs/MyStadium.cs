@@ -45,7 +45,7 @@ namespace BackEnd_Football.APIs
             }
         }
 
-        public async Task<bool> createAsync(string name, string address, string contact, int price)
+        public async Task<bool> createAsync(string token, string name, string address, string contact, int price)
         {
             if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(address) || string.IsNullOrEmpty(contact))
             {
@@ -53,8 +53,18 @@ namespace BackEnd_Football.APIs
             }
             using (DataContext context = new DataContext())
             {
-                SqlStadium? stadium = context.sqlStadium!.Where(s => s.isDelete == false && s.name.CompareTo(name) == 0).FirstOrDefault();
+                SqlStadium? stadium = context.sqlStadium!.Where(s => s.isDelete == false && s.name.CompareTo(name) == 0).Include(s => s.state).FirstOrDefault();
+                SqlState? state = context.sqlStates!.Where(s => s.isdeleted == false && s.code == 2).FirstOrDefault();
                 if (stadium != null)
+                {
+                    return false;
+                }
+                if(state == null)
+                {
+                    return false;
+                }
+                SqlUserSystem? manager = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if(manager == null)
                 {
                     return false;
                 }
@@ -64,7 +74,9 @@ namespace BackEnd_Football.APIs
                 stadium.address = address;
                 stadium.contact = contact;
                 stadium.price = price;
-                stadium.createdTime = DateTime.Now.ToUniversalTime();   
+                stadium.createdTime = DateTime.Now.ToUniversalTime();
+                stadium.state = state;
+                stadium.userSystem = manager;
                 context.sqlStadium!.Add(stadium);
 
                 int rows = await context.SaveChangesAsync();

@@ -13,6 +13,8 @@ public class Program
     public static MyTeam api_myTeam = new MyTeam();
     public static MyStadium api_myStadium = new MyStadium();
     public static MyUserSystem api_userSystem = new MyUserSystem();
+    public static MyOrder api_orderStadium = new MyOrder();
+    public static MyState api_state = new MyState();
     public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
@@ -73,6 +75,7 @@ public class Program
         await api_userSystem.initAsync();
         await api_myTeam.initAsync();
         await api_myStadium.initAsync();
+        await api_state.initAsync();
 
         app.Run();
         

@@ -10,7 +10,7 @@ namespace BackEnd_Football.Models
         [Key]
         public long id { get; set; }
         public string code { get; set; } = "";
-        public DateTime orderTime  { get; set; }
+        public int orderTime  { get; set; }
         public DateTime endTime  { get; set; }
         public DateTime startTime  { get; set; }
         public bool isFinish { get; set; } = false;

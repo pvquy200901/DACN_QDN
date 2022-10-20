@@ -254,7 +254,7 @@ namespace BackEnd_Football.Controllers
             long id = Program.api_userSystem.checkAdmin(token);
             if (id >= 0)
             {
-                bool flag = await Program.api_myStadium.createAsync(stadium.name, stadium.address, stadium.contact, stadium.price);
+                bool flag = await Program.api_myStadium.createAsync(token, stadium.name, stadium.address, stadium.contact, stadium.price);
                 if (flag)
                 {
                     return Ok();
