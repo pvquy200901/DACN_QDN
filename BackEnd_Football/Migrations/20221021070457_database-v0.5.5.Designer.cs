@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BackEnd_Football.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20221012062843_database-v0.5.2")]
-    partial class databasev052
+    [Migration("20221021070457_database-v0.5.5")]
+    partial class databasev055
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -144,8 +144,8 @@ namespace BackEnd_Football.Migrations
                     b.Property<bool>("isFinish")
                         .HasColumnType("boolean");
 
-                    b.Property<DateTime>("orderTime")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<int>("orderTime")
+                        .HasColumnType("integer");
 
                     b.Property<int>("price")
                         .HasColumnType("integer");
@@ -333,7 +333,12 @@ namespace BackEnd_Football.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<long?>("userCreateTeamID")
+                        .HasColumnType("bigint");
+
                     b.HasKey("id");
+
+                    b.HasIndex("userCreateTeamID");
 
                     b.ToTable("Team");
                 });
@@ -524,11 +529,22 @@ namespace BackEnd_Football.Migrations
                     b.Navigation("userSystem");
                 });
 
+            modelBuilder.Entity("BackEnd_Football.Models.SqlTeam", b =>
+                {
+                    b.HasOne("BackEnd_Football.Models.SqlUser", "userCreateTeam")
+                        .WithMany()
+                        .HasForeignKey("userCreateTeamID");
+
+                    b.Navigation("userCreateTeam");
+                });
+
             modelBuilder.Entity("BackEnd_Football.Models.SqlUser", b =>
                 {
-                    b.HasOne("BackEnd_Football.Models.SqlTeam", null)
+                    b.HasOne("BackEnd_Football.Models.SqlTeam", "SqlTeam")
                         .WithMany("user")
                         .HasForeignKey("SqlTeamid");
+
+                    b.Navigation("SqlTeam");
                 });
 
             modelBuilder.Entity("BackEnd_Football.Models.SqlUserSystem", b =>

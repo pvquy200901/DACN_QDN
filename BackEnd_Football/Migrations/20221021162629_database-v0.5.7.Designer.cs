@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BackEnd_Football.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20221012063434_database-v0.5.3")]
-    partial class databasev053
+    [Migration("20221021162629_database-v0.5.7")]
+    partial class databasev057
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -55,46 +55,6 @@ namespace BackEnd_Football.Migrations
                     b.ToTable("Comment");
                 });
 
-            modelBuilder.Entity("BackEnd_Football.Models.News", b =>
-                {
-                    b.Property<long>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("id"));
-
-                    b.Property<string>("contact")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("content")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<List<string>>("images")
-                        .IsRequired()
-                        .HasColumnType("text[]");
-
-                    b.Property<long?>("managerID")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("stateID")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("userID")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("id");
-
-                    b.HasIndex("managerID");
-
-                    b.HasIndex("stateID");
-
-                    b.HasIndex("userID");
-
-                    b.ToTable("News");
-                });
-
             modelBuilder.Entity("BackEnd_Football.Models.SqlFile", b =>
                 {
                     b.Property<long>("ID")
@@ -123,6 +83,57 @@ namespace BackEnd_Football.Migrations
                     b.ToTable("File");
                 });
 
+            modelBuilder.Entity("BackEnd_Football.Models.SqlNews", b =>
+                {
+                    b.Property<long>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("id"));
+
+                    b.Property<string>("code")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("createdTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<List<string>>("images")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.Property<long?>("managerID")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("shortDes")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long?>("stateID")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long?>("userID")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("managerID");
+
+                    b.HasIndex("stateID");
+
+                    b.HasIndex("userID");
+
+                    b.ToTable("News");
+                });
+
             modelBuilder.Entity("BackEnd_Football.Models.SqlOrderStadium", b =>
                 {
                     b.Property<long>("id")
@@ -144,8 +155,8 @@ namespace BackEnd_Football.Migrations
                     b.Property<bool>("isFinish")
                         .HasColumnType("boolean");
 
-                    b.Property<DateTime>("orderTime")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<int>("orderTime")
+                        .HasColumnType("integer");
 
                     b.Property<int>("price")
                         .HasColumnType("integer");
@@ -333,7 +344,12 @@ namespace BackEnd_Football.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<long?>("userCreateTeamID")
+                        .HasColumnType("bigint");
+
                     b.HasKey("id");
+
+                    b.HasIndex("userCreateTeamID");
 
                     b.ToTable("Team");
                 });
@@ -448,7 +464,7 @@ namespace BackEnd_Football.Migrations
 
             modelBuilder.Entity("BackEnd_Football.Models.Comment", b =>
                 {
-                    b.HasOne("BackEnd_Football.Models.News", "News")
+                    b.HasOne("BackEnd_Football.Models.SqlNews", "News")
                         .WithMany("comments")
                         .HasForeignKey("Newsid");
 
@@ -461,7 +477,7 @@ namespace BackEnd_Football.Migrations
                     b.Navigation("useComments");
                 });
 
-            modelBuilder.Entity("BackEnd_Football.Models.News", b =>
+            modelBuilder.Entity("BackEnd_Football.Models.SqlNews", b =>
                 {
                     b.HasOne("BackEnd_Football.Models.SqlUserSystem", "manager")
                         .WithMany()
@@ -524,11 +540,22 @@ namespace BackEnd_Football.Migrations
                     b.Navigation("userSystem");
                 });
 
+            modelBuilder.Entity("BackEnd_Football.Models.SqlTeam", b =>
+                {
+                    b.HasOne("BackEnd_Football.Models.SqlUser", "userCreateTeam")
+                        .WithMany()
+                        .HasForeignKey("userCreateTeamID");
+
+                    b.Navigation("userCreateTeam");
+                });
+
             modelBuilder.Entity("BackEnd_Football.Models.SqlUser", b =>
                 {
-                    b.HasOne("BackEnd_Football.Models.SqlTeam", null)
+                    b.HasOne("BackEnd_Football.Models.SqlTeam", "SqlTeam")
                         .WithMany("user")
                         .HasForeignKey("SqlTeamid");
+
+                    b.Navigation("SqlTeam");
                 });
 
             modelBuilder.Entity("BackEnd_Football.Models.SqlUserSystem", b =>
@@ -540,7 +567,7 @@ namespace BackEnd_Football.Migrations
                     b.Navigation("role");
                 });
 
-            modelBuilder.Entity("BackEnd_Football.Models.News", b =>
+            modelBuilder.Entity("BackEnd_Football.Models.SqlNews", b =>
                 {
                     b.Navigation("comments");
                 });

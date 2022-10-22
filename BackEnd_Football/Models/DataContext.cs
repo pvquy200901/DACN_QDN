@@ -15,7 +15,7 @@ namespace BackEnd_Football.Models
 
 
         public DbSet<Comment>? comments { get; set; }
-        public DbSet<News>? news { get; set; }
+        public DbSet<SqlNews>? sqlNews { get; set; }
         public DbSet<SqlRole>? sqlRoles { get; set; }
         public DbSet<SqlStadium>? sqlStadium { get; set; }
         public DbSet<SqlUser>? users { get; set; }

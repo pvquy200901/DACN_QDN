@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using static BackEnd_Football.APIs.MyUser;
+using static BackEnd_Football.APIs.MyNews;
+using static BackEnd_Football.APIs.MyOrder;
 
 namespace BackEnd_Football.Controllers
 {

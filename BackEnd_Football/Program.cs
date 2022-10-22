@@ -15,6 +15,7 @@ public class Program
     public static MyUserSystem api_userSystem = new MyUserSystem();
     public static MyOrder api_orderStadium = new MyOrder();
     public static MyState api_state = new MyState();
+    public static MyNews api_myNews = new MyNews();
     public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);

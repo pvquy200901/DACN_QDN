@@ -45,7 +45,7 @@ namespace BackEnd_Football.APIs
                     user.Phone = "";
                     user.IsDeleted = false;
                     user.ChucVu = true;
-                    user.birthday = DateTime.Parse("10/02/2001");
+                    //user.birthday = DateTime.Parse("10/02/2001");
                     context.users!.Add(user);
                     int rows = await context.SaveChangesAsync();
                 }
@@ -65,7 +65,7 @@ namespace BackEnd_Football.APIs
                     user.Phone = "";
                     user.IsDeleted = false;
                     user.ChucVu = true;
-                    user.birthday = DateTime.Parse("10/02/2001");
+                    //user.birthday = DateTime.Parse("10/02/2001");
                     context.users!.Add(user);
                     int rows = await context.SaveChangesAsync();
                 }

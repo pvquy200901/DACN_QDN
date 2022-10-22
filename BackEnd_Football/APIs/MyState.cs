@@ -47,6 +47,7 @@ namespace BackEnd_Football.APIs
                     item.isdeleted = false;
                     context.sqlStates!.Add(item);
                 }
+
                 type = context.sqlStates!.Where(s => s.code == 3).FirstOrDefault();
                 if (type == null)
                 {
@@ -57,8 +58,33 @@ namespace BackEnd_Football.APIs
                     item.des = "Đang thi đấu";
                     item.isdeleted = false;
                     context.sqlStates!.Add(item);
+                }  
+                //=========statement---NEWS====
+                type = context.sqlStates!.Where(s => s.code == 4).FirstOrDefault();
+                if (type == null)
+                {
+                    SqlState item = new SqlState();
+                    item.ID = DateTime.Now.Ticks;
+                    item.code = 4;
+                    item.name = "Đang chờ duyệt";
+                    item.des = "Đang chờ duyệt";
+                    item.isdeleted = false;
+                    context.sqlStates!.Add(item);
                 }
-               
+                 
+
+                type = context.sqlStates!.Where(s => s.code == 5).FirstOrDefault();
+                if (type == null)
+                {
+                    SqlState item = new SqlState();
+                    item.ID = DateTime.Now.Ticks;
+                    item.code = 5;
+                    item.name = "Đã đăng";
+                    item.des = "Đã đăng";
+                    item.isdeleted = false;
+                    context.sqlStates!.Add(item);
+                }
+                //===================================================
 
                 type = context.sqlStates!.Where(s => s.code == 8).FirstOrDefault();
                 if (type == null)

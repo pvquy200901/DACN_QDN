@@ -225,7 +225,7 @@ namespace BackEnd_Football.Controllers
 
         [HttpGet]
         [Route("listTeam")]
-        public IActionResult listEmployee([FromHeader] string token)
+        public IActionResult listTeam([FromHeader] string token)
         {
             long id = Program.api_userSystem.checkUserSystem(token);
             if (id >= 0)
