@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using BackEnd_Football.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BackEnd_Football.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20221021070457_database-v0.5.5")]
+    partial class databasev055
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -53,6 +55,46 @@ namespace BackEnd_Football.Migrations
                     b.ToTable("Comment");
                 });
 
+            modelBuilder.Entity("BackEnd_Football.Models.News", b =>
+                {
+                    b.Property<long>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("id"));
+
+                    b.Property<string>("contact")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("content")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<List<string>>("images")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.Property<long?>("managerID")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("stateID")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("userID")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("managerID");
+
+                    b.HasIndex("stateID");
+
+                    b.HasIndex("userID");
+
+                    b.ToTable("News");
+                });
+
             modelBuilder.Entity("BackEnd_Football.Models.SqlFile", b =>
                 {
                     b.Property<long>("ID")
@@ -79,57 +121,6 @@ namespace BackEnd_Football.Migrations
                     b.HasKey("ID");
 
                     b.ToTable("File");
-                });
-
-            modelBuilder.Entity("BackEnd_Football.Models.SqlNews", b =>
-                {
-                    b.Property<long>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("id"));
-
-                    b.Property<string>("code")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("createdTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<List<string>>("images")
-                        .IsRequired()
-                        .HasColumnType("text[]");
-
-                    b.Property<long?>("managerID")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("shortDes")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<long?>("stateID")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("title")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<long?>("userID")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("id");
-
-                    b.HasIndex("managerID");
-
-                    b.HasIndex("stateID");
-
-                    b.HasIndex("userID");
-
-                    b.ToTable("News");
                 });
 
             modelBuilder.Entity("BackEnd_Football.Models.SqlOrderStadium", b =>
@@ -462,7 +453,7 @@ namespace BackEnd_Football.Migrations
 
             modelBuilder.Entity("BackEnd_Football.Models.Comment", b =>
                 {
-                    b.HasOne("BackEnd_Football.Models.SqlNews", "News")
+                    b.HasOne("BackEnd_Football.Models.News", "News")
                         .WithMany("comments")
                         .HasForeignKey("Newsid");
 
@@ -475,7 +466,7 @@ namespace BackEnd_Football.Migrations
                     b.Navigation("useComments");
                 });
 
-            modelBuilder.Entity("BackEnd_Football.Models.SqlNews", b =>
+            modelBuilder.Entity("BackEnd_Football.Models.News", b =>
                 {
                     b.HasOne("BackEnd_Football.Models.SqlUserSystem", "manager")
                         .WithMany()
@@ -565,7 +556,7 @@ namespace BackEnd_Football.Migrations
                     b.Navigation("role");
                 });
 
-            modelBuilder.Entity("BackEnd_Football.Models.SqlNews", b =>
+            modelBuilder.Entity("BackEnd_Football.Models.News", b =>
                 {
                     b.Navigation("comments");
                 });

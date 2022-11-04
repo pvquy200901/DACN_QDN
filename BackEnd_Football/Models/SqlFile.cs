@@ -3,14 +3,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BackEnd_Football.Models
 {
-    [Table("Statements")]
-    public class SqlState
+    [Table("File")]
+    public class SqlFile
     {
         [Key]
         public long ID { get; set; }
-        public int code { get; set; }
+        public string key { get; set; } = "";
+        public string link { get; set; } = "";
         public string name { get; set; } = "";
-        public string des { get; set; } = "";
-        public bool isdeleted { get; set; } = false;
+        public DateTime time { get; set; }
     }
 }

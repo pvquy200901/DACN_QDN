@@ -16,7 +16,6 @@ namespace BackEnd_Football.Models
         public bool isDelete { get; set; } = false;
         public DateTime createdTime { get; set; }
         public int price { get; set; } = 0;
-        public SqlUser? user { get; set; }
         public SqlUserSystem? userSystem { get; set; }
         public SqlState? state { get; set; }
     }

@@ -15,7 +15,7 @@ namespace BackEnd_Football.Models
 
 
         public DbSet<Comment>? comments { get; set; }
-        public DbSet<News>? news { get; set; }
+        public DbSet<SqlNews>? sqlNews { get; set; }
         public DbSet<SqlRole>? sqlRoles { get; set; }
         public DbSet<SqlStadium>? sqlStadium { get; set; }
         public DbSet<SqlUser>? users { get; set; }
@@ -23,6 +23,8 @@ namespace BackEnd_Football.Models
         public DbSet<SqlUserSystem>? sqlUserSystems { get; set; }
         public DbSet<SqlTeam>? SqlTeams { get; set; }
         public DbSet<SqlState>? sqlStates { get; set; }
+        public DbSet<SqlOrderStadium>? sqlOrderStadium { get; set; }
+        public DbSet<SqlFile>? sqlFiles { get; set; }
 
         //public static string configSql = "Host=office.stvg.vn:50022;Database=db_stvg_luxjapancare;Username=stvg;Password=stvg";
         public static string configSql = "Host=localhost:5432;Database=db_DACN;Username=postgres;Password=postgres";
@@ -34,7 +36,7 @@ namespace BackEnd_Football.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-          
+            modelBuilder.Entity<SqlUser>().HasOne<SqlTeam>(s => s.SqlTeam).WithMany(s => s.user);
         }
     }
 }
