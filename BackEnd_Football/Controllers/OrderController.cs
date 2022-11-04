@@ -57,5 +57,13 @@ namespace BackEnd_Football.Controllers
                 return BadRequest();
             }
         }
+
+        [HttpGet]
+        [Route("getInfoOrder")]
+        public IActionResult getInfoOrder([FromHeader] string token, string code)
+        {
+            return Ok(Program.api_orderStadium!.GetInfoOrderForCustomer(token,code));
+        }
+
     }
 }

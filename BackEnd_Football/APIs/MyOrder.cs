@@ -65,7 +65,7 @@ namespace BackEnd_Football.APIs
                 order.id = DateTime.Now.Ticks;
                 order.userOrder = user;
                 order.code = generatorcode();
-                order.orderTime = m_order.ordertime;
+               
                 try
                 {
                     DateTime time;
@@ -98,7 +98,7 @@ namespace BackEnd_Football.APIs
                 {
                     order.endTime = DateTime.MinValue.ToUniversalTime();
                 }
-
+                order.orderTime = m_order.ordertime;
                 order.price = stadium.price * m_order.ordertime;
 
                 order.isFinish = false;
@@ -234,6 +234,49 @@ namespace BackEnd_Football.APIs
                     return false;
                 }
             }
+        }
+
+        public class infoOrder
+        {
+            public string nameStadium { get; set; } = "";
+            public string date { get; set; } = "";
+            public int orderTime { get; set; }
+            public string startTime { get; set; } = "";
+            public string endTime { get; set; } = "";
+            public int price { get; set; }
+        }
+
+       
+        public infoOrder GetInfoOrderForCustomer(string token, string code)
+        {
+            using(DataContext context = new DataContext())
+            {
+                SqlUser? m_user = context.users!.Where(s => s.IsDeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if(m_user == null)
+                {
+                    return new infoOrder();
+                }
+
+                infoOrder temp = new infoOrder();
+                SqlOrderStadium? m_order = context.sqlOrderStadium!.Include(s => s.userOrder)
+                                                                    .Where(s => s.isDelete == false && s.isFinish == false && s.code.CompareTo(code) == 0 && s.userOrder == m_user)
+                                                                    .Include(s => s.stadiumOrder)
+                                                                    .FirstOrDefault();
+
+                if(m_order == null)
+                {
+                    return new infoOrder();
+                }
+
+                temp.nameStadium = m_order.stadiumOrder!.name;
+                temp.date = m_order.startTime.ToLocalTime().ToString("dd/MM/yyyy");
+                temp.orderTime = m_order.orderTime;
+                temp.startTime = m_order.startTime.ToLocalTime().ToString("hh:mm");
+                temp.endTime = m_order.endTime.ToLocalTime().ToString("hh:mm");
+                temp.price = m_order.price;
+
+                return temp;
+            }   
         }
     }
 

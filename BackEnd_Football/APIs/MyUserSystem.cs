@@ -302,12 +302,18 @@ namespace BackEnd_Football.APIs
             public string avatar { get; set; } = "";
             public string role { get; set; } = "";
         }
-
-        public List<ItemUserSystem> getList(string token)
+        public class infoUserSystem
+        {
+            public string displayName { get; set; } = "";
+            public string phone { get; set; } = "";
+            public string role { get; set; } = "";
+            public string avatar { get; set; } = "";
+        }
+        public List<infoUserSystem> getListUserSystem(string token)
         {
             using (DataContext context = new DataContext())
             {
-                List<ItemUserSystem> items = new List<ItemUserSystem>();
+                List<infoUserSystem> items = new List<infoUserSystem>();
                 SqlUserSystem? m_user = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).Include(s => s.role).FirstOrDefault();
                 if (m_user == null)
                 {
@@ -322,12 +328,11 @@ namespace BackEnd_Football.APIs
                     List<SqlUserSystem> users = context.sqlUserSystems!.Where(s => s.isdeleted == false).Include(s => s.role).ToList();
                     foreach (SqlUserSystem user in users)
                     {
-                        ItemUserSystem item = new ItemUserSystem();
-                        item.user = user.user;
-                        item.username = user.username;
+                        infoUserSystem item = new infoUserSystem();
+
                         item.avatar = user.avatar;
-                        item.phoneNumber = user.phoneNumber;
-                        item.des = user.des;
+                        item.phone = user.phoneNumber;
+
                         if (user.role != null)
                         {
                             item.role = user.role.name;
@@ -335,7 +340,39 @@ namespace BackEnd_Football.APIs
                         items.Add(item);
                     }
                 }
-               
+
+                return items;
+            }
+        }
+
+        public List<infoUserSystem> getListUserSystemForCustomer(string token)
+        {
+            using (DataContext context = new DataContext())
+            {
+                List<infoUserSystem> items = new List<infoUserSystem>();
+                SqlUser? m_user = context.users!.Where(s => s.IsDeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if (m_user == null)
+                {
+                    return items;
+                }
+
+                List<SqlUserSystem> users = context.sqlUserSystems!.Where(s => s.isdeleted == false).Include(s => s.role).ToList();
+                foreach (SqlUserSystem user in users)
+                {
+                    infoUserSystem item = new infoUserSystem();
+
+                    item.displayName = user.user;
+                    item.avatar = user.avatar;
+                    item.phone = user.phoneNumber;
+
+                    if (user.role != null)
+                    {
+                        item.role = user.role.name;
+                    }
+                    items.Add(item);
+                }
+
+
                 return items;
             }
         }

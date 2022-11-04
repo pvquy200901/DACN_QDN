@@ -5,7 +5,7 @@ namespace BackEnd_Football.APIs
 {
     public class MyTeam
     {
-        public  MyTeam() {}
+        public MyTeam() { }
 
         public async Task initAsync()
         {
@@ -153,7 +153,7 @@ namespace BackEnd_Football.APIs
             }
         }
 
-        public async Task<string> setLogoAsync(string name, byte[] file)
+        public async Task<string> setLogoAsync(string token, string name, byte[] file)
         {
             if (string.IsNullOrEmpty(name))
             {
@@ -161,7 +161,8 @@ namespace BackEnd_Football.APIs
             }
             using (DataContext context = new DataContext())
             {
-                SqlTeam? team = context.SqlTeams!.Where(s => s.isdeleted == false && s.name.CompareTo(name) == 0).FirstOrDefault();
+                SqlTeam? team = context.SqlTeams!.Include(s => s.userCreateTeam)
+                                                .Where(s => s.isdeleted == false && s.name.CompareTo(name) == 0 && s.userCreateTeam!.IsDeleted == false && s.userCreateTeam.token.CompareTo(token) == 0).FirstOrDefault();
                 if (team == null)
                 {
                     return "";
@@ -187,7 +188,7 @@ namespace BackEnd_Football.APIs
             }
         }
 
-        public async Task<bool> clearLogoAsync(string name)
+        public async Task<bool> clearLogoAsync(string token, string name)
         {
             if (string.IsNullOrEmpty(name))
             {
@@ -195,7 +196,8 @@ namespace BackEnd_Football.APIs
             }
             using (DataContext context = new DataContext())
             {
-                SqlTeam? team = context.SqlTeams!.Where(s => s.isdeleted == false && s.name.CompareTo(name) == 0).FirstOrDefault();
+                SqlTeam? team = context.SqlTeams!.Include(s => s.userCreateTeam)
+                                                .Where(s => s.isdeleted == false && s.name.CompareTo(name) == 0 && s.userCreateTeam!.IsDeleted == false && s.userCreateTeam.token.CompareTo(token) == 0).FirstOrDefault();
                 if (team == null)
                 {
                     return false;
@@ -215,7 +217,7 @@ namespace BackEnd_Football.APIs
             }
         }
 
-        public async Task<string> addImageTeamAsync(string name, byte[] file)
+        public async Task<string> addImageTeamAsync(string token, string name, byte[] file)
         {
             if (string.IsNullOrEmpty(name))
             {
@@ -223,7 +225,8 @@ namespace BackEnd_Football.APIs
             }
             using (DataContext context = new DataContext())
             {
-                SqlTeam? team = context.SqlTeams!.Where(s => s.isdeleted == false && s.name.CompareTo(name) == 0).FirstOrDefault();
+                SqlTeam? team = context.SqlTeams!.Include(s => s.userCreateTeam)
+                                                .Where(s => s.isdeleted == false && s.name.CompareTo(name) == 0 && s.userCreateTeam!.IsDeleted == false && s.userCreateTeam.token.CompareTo(token) == 0).FirstOrDefault();
                 if (team == null)
                 {
                     return "";
@@ -253,7 +256,7 @@ namespace BackEnd_Football.APIs
             }
         }
 
-        public async Task<bool> removeImageTeamAsync(string name, string code)
+        public async Task<bool> removeImageTeamAsync(string token, string name, string code)
         {
             if (string.IsNullOrEmpty(name))
             {
@@ -261,7 +264,8 @@ namespace BackEnd_Football.APIs
             }
             using (DataContext context = new DataContext())
             {
-                SqlTeam? team = context.SqlTeams!.Where(s => s.isdeleted == false && s.name.CompareTo(name) == 0).FirstOrDefault();
+                SqlTeam? team = context.SqlTeams!.Include(s => s.userCreateTeam)
+                                                .Where(s => s.isdeleted == false && s.name.CompareTo(name) == 0 && s.userCreateTeam!.IsDeleted == false && s.userCreateTeam.token.CompareTo(token) == 0).FirstOrDefault();
                 if (team == null)
                 {
                     return false;
@@ -298,6 +302,7 @@ namespace BackEnd_Football.APIs
             public string phone { get; set; } = "";
             public string logo { get; set; } = "";
             public string des { get; set; } = "";
+            public int quality { get; set; }
             public List<string> imageTeam { get; set; } = new List<string>();
         }
 
@@ -315,6 +320,7 @@ namespace BackEnd_Football.APIs
                     item.phone = team.PhoneNumber;
                     item.logo = team.logo;
                     item.des = team.des;
+                    item.quality = team.quantity;
                     if (team.imagesTeam != null)
                     {
                         item.imageTeam.AddRange(team.imagesTeam);
@@ -325,19 +331,39 @@ namespace BackEnd_Football.APIs
             }
         }
 
+        //public List<ItemTeam> getListTeamAdd()
+        //{
+        //    using (DataContext context = new DataContext())
+        //    {
+        //        List<ItemTeam> items = new List<ItemTeam>();
+        //        List<SqlTeam> teams = context.SqlTeams!.Where(s => s.isdeleted == false).ToList();
+        //        foreach (SqlTeam team in teams)
+        //        {
+        //            ItemTeam item = new ItemTeam();
+        //            item.name = team.name;
+        //            item.shortName = team.shortName;
+        //            item.phone = team.PhoneNumber;
+        //            item.logo = team.logo;
+        //            item.des = team.des;
+        //            if (team.imagesTeam != null)
+        //            {
+        //                item.imageTeam.AddRange(team.imagesTeam);
+        //            }
+        //            items.Add(item);
+        //        }
+        //        return items;
+        //    }
+        //}
         public ItemTeam getInfoTeam(string token, string code)
         {
             using (DataContext context = new DataContext())
             {
-                SqlUserSystem? user = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).Include(s => s.role).FirstOrDefault();
+                SqlUser? user = context.users!.Where(s => s.IsDeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
                 if (user == null)
                 {
                     return new ItemTeam();
                 }
-                //if (user.role!.code.CompareTo("admin") != 0)
-                //{
-                //    return new ItemEmployee();
-                //}
+
                 SqlTeam? emp = context.SqlTeams!.Where(s => s.isdeleted == false && s.name.CompareTo(code) == 0).FirstOrDefault();
                 if (emp == null)
                 {

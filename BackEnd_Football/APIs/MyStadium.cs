@@ -259,36 +259,61 @@ namespace BackEnd_Football.APIs
             }
         }
 
-        public ItemStadium getInfoTeam(string token, string code)
+        public List<ItemStadium> getListStadiumReady()
         {
             using (DataContext context = new DataContext())
             {
-                SqlUserSystem? user = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).Include(s => s.role).FirstOrDefault();
-                if (user == null)
+                int state = 1;
+                List<ItemStadium> items = new List<ItemStadium>();
+                List<SqlStadium> stadiums = context.sqlStadium!.Where(s => s.isDelete == false && s.state.code == state).ToList();
+                foreach (SqlStadium stadium in stadiums)
                 {
-                    return new ItemStadium();
+                    ItemStadium item = new ItemStadium();
+                    item.name = stadium.name;
+                    item.address = stadium.address;
+                    item.contact = stadium.contact;
+                    item.price = stadium.price;
+                    if (stadium.images != null)
+                    {
+                        item.images.AddRange(stadium.images);
+                    }
+                    items.Add(item);
                 }
-                //if (user.role!.code.CompareTo("admin") != 0)
-                //{
-                //    return new ItemEmployee();
-                //}
-                SqlStadium? emp = context.sqlStadium!.Where(s => s.isDelete == false && s.name.CompareTo(code) == 0).FirstOrDefault();
-                if (emp == null)
-                {
-                    return new ItemStadium();
-                }
-                ItemStadium item = new ItemStadium();
-                item.name = emp.name;
-                item.address = emp.address;
-                item.contact = emp.contact;
-                item.price = emp.price;
-                if (emp.images != null)
-                {
-                    item.images.AddRange(emp.images);
-                }
-
-                return item;
+                return items;
             }
         }
+
+
+        //public ItemStadium getInfoTeam(string token, string code)
+        //{
+        //    using (DataContext context = new DataContext())
+        //    {
+        //        SqlUserSystem? user = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).Include(s => s.role).FirstOrDefault();
+        //        if (user == null)
+        //        {
+        //            return new ItemStadium();
+        //        }
+        //        //if (user.role!.code.CompareTo("admin") != 0)
+        //        //{
+        //        //    return new ItemEmployee();
+        //        //}
+        //        SqlStadium? emp = context.sqlStadium!.Where(s => s.isDelete == false && s.name.CompareTo(code) == 0).FirstOrDefault();
+        //        if (emp == null)
+        //        {
+        //            return new ItemStadium();
+        //        }
+        //        ItemStadium item = new ItemStadium();
+        //        item.name = emp.name;
+        //        item.address = emp.address;
+        //        item.contact = emp.contact;
+        //        item.price = emp.price;
+        //        if (emp.images != null)
+        //        {
+        //            item.images.AddRange(emp.images);
+        //        }
+
+        //        return item;
+        //    }
+        //}
     }
  }
