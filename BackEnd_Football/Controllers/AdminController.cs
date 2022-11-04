@@ -123,105 +123,80 @@ namespace BackEnd_Football.Controllers
             }
         }
 
-        [HttpPut]
-        [Route("setLogoTeam")]
-        public async Task<IActionResult> setLogoTeamAsync([FromHeader] string token, string team, IFormFile image)
-        {
-            long id = Program.api_userSystem.checkAdmin(token);
-            if (id >= 0)
-            {
-                using (MemoryStream ms = new MemoryStream())
-                {
-                    image.CopyTo(ms);
-                    string code = await Program.api_myTeam.setLogoAsync(team, ms.ToArray());
-                    if (string.IsNullOrEmpty(code))
-                    {
-                        return BadRequest();
-                    }
-                    else
-                    {
-                        return Ok(code);
-                    }
-                }
-            }
-            else
-            {
-                return Unauthorized();
-            }
-        }
+       
 
-        [HttpDelete]
-        [Route("clearLogoTeam")]
-        public async Task<IActionResult> clearLogoTeamAsync([FromHeader] string token, string team)
-        {
-            long id = Program.api_userSystem.checkAdmin(token);
-            if (id >= 0)
-            {
-                bool flag = await Program.api_myTeam.clearLogoAsync(team);
-                if (flag)
-                {
-                    return Ok();
-                }
-                else
-                {
-                    return BadRequest();
-                }
-            }
-            else
-            {
-                return Unauthorized();
-            }
-        }
+        //[HttpDelete]
+        //[Route("clearLogoTeam")]
+        //public async Task<IActionResult> clearLogoTeamAsync([FromHeader] string token, string team)
+        //{
+        //    long id = Program.api_userSystem.checkAdmin(token);
+        //    if (id >= 0)
+        //    {
+        //        bool flag = await Program.api_myTeam.clearLogoAsync(team);
+        //        if (flag)
+        //        {
+        //            return Ok();
+        //        }
+        //        else
+        //        {
+        //            return BadRequest();
+        //        }
+        //    }
+        //    else
+        //    {
+        //        return Unauthorized();
+        //    }
+        //}
 
-        [HttpPut]
-        [Route("addImageTeam")]
-        public async Task<IActionResult> addImageTeamAsync([FromHeader] string token, string team, IFormFile image)
-        {
-            long id = Program.api_userSystem.checkAdmin(token);
-            if (id >= 0)
-            {
-                using (MemoryStream ms = new MemoryStream())
-                {
-                    image.CopyTo(ms);
-                    string code = await Program.api_myTeam.addImageTeamAsync(team, ms.ToArray());
-                    if (string.IsNullOrEmpty(code))
-                    {
-                        return BadRequest();
-                    }
-                    else
-                    {
-                        return Ok(code);
-                    }
-                }
-            }
-            else
-            {
-                return Unauthorized();
-            }
-        }
+        //[HttpPut]
+        //[Route("addImageTeam")]
+        //public async Task<IActionResult> addImageTeamAsync([FromHeader] string token, string team, IFormFile image)
+        //{
+        //    long id = Program.api_userSystem.checkAdmin(token);
+        //    if (id >= 0)
+        //    {
+        //        using (MemoryStream ms = new MemoryStream())
+        //        {
+        //            image.CopyTo(ms);
+        //            string code = await Program.api_myTeam.addImageTeamAsync(team, ms.ToArray());
+        //            if (string.IsNullOrEmpty(code))
+        //            {
+        //                return BadRequest();
+        //            }
+        //            else
+        //            {
+        //                return Ok(code);
+        //            }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        return Unauthorized();
+        //    }
+        //}
 
-        [HttpDelete]
-        [Route("removeImageTeam")]
-        public async Task<IActionResult> removeImageTeamAsync([FromHeader] string token, string team, string code)
-        {
-            long id = Program.api_userSystem.checkAdmin(token);
-            if (id >= 0)
-            {
-                bool flag = await Program.api_myTeam.removeImageTeamAsync(team, code);
-                if (flag)
-                {
-                    return Ok();
-                }
-                else
-                {
-                    return BadRequest();
-                }
-            }
-            else
-            {
-                return Unauthorized();
-            }
-        }
+        //[HttpDelete]
+        //[Route("removeImageTeam")]
+        //public async Task<IActionResult> removeImageTeamAsync([FromHeader] string token, string team, string code)
+        //{
+        //    long id = Program.api_userSystem.checkAdmin(token);
+        //    if (id >= 0)
+        //    {
+        //        bool flag = await Program.api_myTeam.removeImageTeamAsync(team, code);
+        //        if (flag)
+        //        {
+        //            return Ok();
+        //        }
+        //        else
+        //        {
+        //            return BadRequest();
+        //        }
+        //    }
+        //    else
+        //    {
+        //        return Unauthorized();
+        //    }
+        //}
 
         [HttpGet]
         [Route("listTeam")]
@@ -316,20 +291,20 @@ namespace BackEnd_Football.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("getInfoStadium")]
-        public IActionResult getInfoStadium([FromHeader] string token, string stadium)
-        {
-            long id = Program.api_userSystem.checkUserSystem(token);
-            if (id >= 0)
-            {
-                return Ok(Program.api_myStadium.getInfoTeam(token, stadium));
-            }
-            else
-            {
-                return Unauthorized();
-            }
-        }
+        //[HttpGet]
+        //[Route("getInfoStadium")]
+        //public IActionResult getInfoStadium([FromHeader] string token, string stadium)
+        //{
+        //    long id = Program.api_userSystem.checkUserSystem(token);
+        //    if (id >= 0)
+        //    {
+        //        return Ok(Program.api_myStadium.getInfoTeam(token, stadium));
+        //    }
+        //    else
+        //    {
+        //        return Unauthorized();
+        //    }
+        //}
 
 
         [HttpPut]

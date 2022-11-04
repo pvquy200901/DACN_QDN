@@ -64,10 +64,20 @@ namespace BackEnd_Football.APIs
                 news.createdTime = DateTime.Now.ToUniversalTime();
 
                 news.state = state;
-                news.user = user;   
-                news.manager = manager;
+                news.user = user;
+                //string img = await Program.api_myFile.saveFileAsync(string.Format("{0}.jpg", DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")), file);
+                //if (string.IsNullOrEmpty(img))
+                //{
+                //    return "";
+                //}
+                //if(news.images == null)
+                //{
+                //    news.images = new List<string>();
+                //}
+                //news.images.Add(img);
+                //news.manager = manager;
 
-                news.state = context.sqlStates!.Where(s => s.isdeleted == false && s.code == 4).FirstOrDefault();
+                //news.state = context.sqlStates!.Where(s => s.isdeleted == false && s.code == 4).FirstOrDefault();
                 context.sqlNews!.Add(news);
                 int rows = await context.SaveChangesAsync();
                 if (rows > 0)
@@ -83,6 +93,7 @@ namespace BackEnd_Football.APIs
 
         public async Task<string> editNewsAsync(string token, string code, M_news m_news)
         {
+            int stateNews = 4;
             using (DataContext context = new DataContext())
             {
                 SqlUser? user = context.users!.Where(s => s.IsDeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
@@ -91,7 +102,8 @@ namespace BackEnd_Football.APIs
                     return "";
                 }
 
-                SqlNews? news = context.sqlNews!.Where(s => s.code.CompareTo(code) == 0
+                SqlNews? news = context.sqlNews!.Include(s => s.user)
+                                                .Where(s => s.code.CompareTo(code) == 0 && s.state!.code == stateNews
                                                                     && s.user!.ID == user.ID).FirstOrDefault();
                 if (news == null)
                 {
@@ -118,59 +130,89 @@ namespace BackEnd_Football.APIs
         }
 
 
-        //phê duyệt được lựa chọn là đã duyệt hoặc hủy duyệt
-        public async Task<string> confirmNewsAsync( string token, string code, int confirm)
+
+        public async Task<string> addImageNewsAsync(string token, string news, byte[] file)
+        {
+            if (string.IsNullOrEmpty(news))
+            {
+                return "";
+            }
+            using (DataContext context = new DataContext())
+            {
+                SqlUser? user = context.users!.Where(s => s.IsDeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if (user == null)
+                {
+                    return "";
+                }
+
+                SqlState? state = context.sqlStates!.Where(s => s.code == 4 && s.isdeleted == false).FirstOrDefault();
+                if (state == null)
+                {
+                    return "";
+                }
+
+                SqlNews? m_news = context.sqlNews!.Include(s => s.state).Where(s => s.code.CompareTo(news) == 0 && s.state == state).FirstOrDefault();
+                if(m_news == null)
+                {
+                    return "";
+                }
+
+                string code = await Program.api_myFile.saveFileAsync(string.Format("{0}.jpg", DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")), file);
+                if (string.IsNullOrEmpty(code))
+                {
+                    return "";
+                }
+
+                if (m_news.images == null)
+                {
+                    m_news.images = new List<string>();
+                }
+                m_news.images.Add(code);
+
+                int rows = await context.SaveChangesAsync();
+                if (rows > 0)
+                {
+                    return code;
+                }
+                else
+                {
+                    return "";
+                }
+            }
+        }
+        //phê duyệt được lựa chọn là đã duyệt 
+        public async Task<bool> confirmNewsAsync( string token, string code)
         {
             using (DataContext context = new DataContext())
             {
                 SqlNews? news = context.sqlNews!.Where(s => s.code.CompareTo(code) == 0 && s.state!.code == 4).Include(s => s.state).FirstOrDefault();
                 if (news == null)
                 {
-                    return "";
+                    return false;
                 }
                 SqlUserSystem? userSystem = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
                 if (userSystem == null)
                 {
-                    return "";
+                    return false;
                 }
 
                 SqlState? state = context.sqlStates!.Where(s => s.code == 5 && s.isdeleted == false).FirstOrDefault();
                 if (state == null)
                 {
-                    return "";
-                } 
-                SqlState? state1 = context.sqlStates!.Where(s => s.code == 11 && s.isdeleted == false).FirstOrDefault();
-                if (state == null)
-                {
-                    return "";
+                    return false;
                 }
 
-                if(confirm == 0)
-                {
-                    return "";
-                }
-                else if (confirm == 1)
-                {
-                    news.state = state;
-                    news.createdTime = DateTime.Now.ToUniversalTime();
-                    news.state = context.sqlStates!.Where(s => s.isdeleted == false && s.code == 5).FirstOrDefault();
-                }
-                else if (confirm == 2)
-                {
-                    news.state = state1;
-                    news.createdTime = DateTime.Now.ToUniversalTime();
-                    news.state = context.sqlStates!.Where(s => s.isdeleted == false && s.code == 11).FirstOrDefault();
-                }
+                news.state = state;
 
 
                 int rows = await context.SaveChangesAsync();
                 if (rows > 0)
                 {
-                    return news.code;
+                    return true;
                 }
                 else
                 {
-                    return "";
+                    return false;
                 }
             }
         }
@@ -193,7 +235,7 @@ namespace BackEnd_Football.APIs
                     return false;
                 }
 
-                context.sqlNews.Remove(news);
+                context.sqlNews!.Remove(news);
                 int rows = await context.SaveChangesAsync();
                 if (rows > 0)
                 {
@@ -247,6 +289,7 @@ namespace BackEnd_Football.APIs
 
         public class ItemNews
         {
+            public string code { get; set; } = "";
             public string title { get; set; } = "";
             public string shortDes { get; set; } = "";
             public string createdTime { get; set; } = "";
@@ -262,6 +305,7 @@ namespace BackEnd_Football.APIs
                 foreach (SqlNews news in listNews)
                 {
                     ItemNews itemNews = new ItemNews();
+                    itemNews.code = news.code;
                     itemNews.title = news.title;
                     //itemNews.description = news.description;
                     itemNews.shortDes = news.shortDes;
@@ -286,6 +330,7 @@ namespace BackEnd_Football.APIs
                 foreach (SqlNews news in listNews)
                 {
                     ItemNews itemNews = new ItemNews();
+                    itemNews.code = news.code;
                     itemNews.title = news.title;
                     itemNews.shortDes = news.shortDes;
                     itemNews.createdTime = news.createdTime.ToString();
@@ -370,6 +415,35 @@ namespace BackEnd_Football.APIs
                 {
                     return false;
                 }
+            }
+        }
+
+        public ItemInfoNews getInfoNewsForCustomer(string token, string code)
+        {
+            using (DataContext context = new DataContext())
+            {
+                SqlNews? news = context.sqlNews!.Include(s => s.state).Where(s => s.code.CompareTo(code) == 0 && s.state!.code == 5).FirstOrDefault();
+                if (news == null)
+                {
+                    return new ItemInfoNews();
+                }
+
+                SqlUser? user= context.users!.Where(s => s.IsDeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if (user == null)
+                {
+                    return new ItemInfoNews();
+                }
+
+                ItemInfoNews itemNews = new ItemInfoNews();
+                itemNews.title = news.title;
+                itemNews.description = news.description;
+                itemNews.shortDes = news.shortDes;
+                itemNews.createdTime = news.createdTime.ToString();
+                if (news.images != null)
+                {
+                    itemNews.imagesNews.AddRange(news.images);
+                }
+                return itemNews;
             }
         }
     }

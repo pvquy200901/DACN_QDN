@@ -18,17 +18,37 @@ namespace BackEnd_Football.Controllers
         [Route("createNews")]
         public async Task<IActionResult> createNewsAsync([FromHeader] string token, M_news m_News)
         {
-            string news = await Program.api_myNews.createNewsAsync(token, m_News);
-            if (string.IsNullOrEmpty(news))
-            {
-                return BadRequest();
-            }
-            else
-            {
-                return Ok(news);
-            }
+           
+                string code = await Program.api_myNews.createNewsAsync(token, m_News);
+                if (string.IsNullOrEmpty(code))
+                {
+                    return BadRequest();
+                }
+                else
+                {
+                    return Ok(code);
+                }
+            
         }
 
+        [HttpPost]
+        [Route("addImageNews")]
+        public async Task<IActionResult> addImageNews([FromHeader] string token, string news, IFormFile image)
+        {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                image.CopyTo(ms);
+                string code = await Program.api_myNews.addImageNewsAsync(token, news, ms.ToArray());
+                if (string.IsNullOrEmpty(code))
+                {
+                    return BadRequest();
+                }
+                else
+                {
+                    return Ok(code);
+                }
+            }
+        }
         [HttpPut]
         [Route("editNews")]
         public async Task<IActionResult> UpdateOrderAsync([FromHeader] string token, string code, M_news m_News)
@@ -46,13 +66,13 @@ namespace BackEnd_Football.Controllers
         
         [HttpPut]
         [Route("confirmNews")]
-        public async Task<IActionResult> ConfirmOrderAsync([FromHeader] string token, string code, int confirm)
+        public async Task<IActionResult> ConfirmOrderAsync([FromHeader] string token, string code)
         {
             long id = Program.api_userSystem.checkAdmin(token);
             if (id >= 0)
             {
-                string news = await Program.api_myNews.confirmNewsAsync(token, code, confirm);
-                if (string.IsNullOrEmpty(news))
+                bool news = await Program.api_myNews.confirmNewsAsync(token, code);
+                if (news == false)
                 {
                     return BadRequest();
                 }
@@ -165,6 +185,13 @@ namespace BackEnd_Football.Controllers
             {
                 return BadRequest();
             }            
+        }
+
+        [HttpGet]
+        [Route("getInfoNewsForCustomer")]
+        public IActionResult getInfoNewsForCustomer([FromHeader] string token, string news)
+        {           
+                return Ok(Program.api_myNews.getInfoNewsForCustomer(token, news));   
         }
     }
 }
