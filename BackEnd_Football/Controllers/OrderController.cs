@@ -65,5 +65,19 @@ namespace BackEnd_Football.Controllers
             return Ok(Program.api_orderStadium!.GetInfoOrderForCustomer(token,code));
         }
 
+        [HttpDelete]
+        [Route("cancelOrderOfCustomer")]
+        public async Task<IActionResult> cancelOrderOfCustomerAsync([FromHeader] string token, string order)
+        {
+            bool flag = await Program.api_orderStadium.cancelOrderOfCustomerAsync(token, order);
+            if (flag)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
     }
 }

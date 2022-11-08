@@ -1,6 +1,7 @@
 ﻿using BackEnd_Football.Models;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
+using System.Globalization;
 
 namespace BackEnd_Football.APIs
 {
@@ -148,7 +149,7 @@ namespace BackEnd_Football.APIs
             public string name { get; set; } = "";
             public string email { get; set; } = "";
             public string phone { get; set; } = "";
-            public DateTime birthday { get; set; }
+            public string birthday { get; set; } = "";
         }
         public async Task<bool> editUserAsync(string token, editUser user)
         {
@@ -177,7 +178,22 @@ namespace BackEnd_Football.APIs
                     m_user.Phone = user.phone;
                 }
 
-                m_user.birthday = user.birthday.ToLocalTime() ;
+                try
+                {
+                    DateTime time;
+                    if (DateTime.TryParse(user.birthday, CultureInfo.CurrentCulture, DateTimeStyles.None, out time))
+                    {
+                        m_user.birthday = time.ToUniversalTime();
+                    }
+                    else
+                    {
+                        m_user.birthday = DateTime.MinValue.ToUniversalTime();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    m_user.birthday = DateTime.MinValue.ToUniversalTime();
+                }
 
                 int rows = await context.SaveChangesAsync();
                 if (rows > 0)
@@ -449,6 +465,7 @@ namespace BackEnd_Football.APIs
             public string avatar { get; set; } = "";
             public string phone { get; set; } = "";
             public string email { get; set; } = "";
+            public string birthday { get; set; } = "";
         }
 
         public List<userInTeam> listUserInTeam(string token)
@@ -476,6 +493,7 @@ namespace BackEnd_Football.APIs
                             temp.avatar = tmp.PhotoURL;
                             temp.phone = tmp.Phone;
                             temp.email = tmp.Email;
+                            temp.birthday = tmp.birthday.ToLocalTime().ToString("dd/MM/yyyy");
 
                             myUser.Add(temp);
                         }

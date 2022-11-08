@@ -280,5 +280,13 @@ namespace BackEnd_Football.Controllers
                 }
            
         }
+
+        [HttpGet]
+        [Route("listOrder")]
+        public IActionResult listOrder([FromHeader] string token)
+        {
+
+            return Ok(Program.api_orderStadium.getListOrder(token));
+        }
     }
 }
