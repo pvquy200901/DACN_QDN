@@ -232,7 +232,7 @@ namespace BackEnd_Football.APIs
             public string name { get; set; } = "";
             public string address { get; set; } = "";
             public string contact { get; set; } = "";
-            public int price { get; set; }
+            public float price { get; set; }
             public List<string> images { get; set; } = new List<string>();
         }
 
@@ -284,36 +284,33 @@ namespace BackEnd_Football.APIs
         }
 
 
-        //public ItemStadium getInfoTeam(string token, string code)
-        //{
-        //    using (DataContext context = new DataContext())
-        //    {
-        //        SqlUserSystem? user = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).Include(s => s.role).FirstOrDefault();
-        //        if (user == null)
-        //        {
-        //            return new ItemStadium();
-        //        }
-        //        //if (user.role!.code.CompareTo("admin") != 0)
-        //        //{
-        //        //    return new ItemEmployee();
-        //        //}
-        //        SqlStadium? emp = context.sqlStadium!.Where(s => s.isDelete == false && s.name.CompareTo(code) == 0).FirstOrDefault();
-        //        if (emp == null)
-        //        {
-        //            return new ItemStadium();
-        //        }
-        //        ItemStadium item = new ItemStadium();
-        //        item.name = emp.name;
-        //        item.address = emp.address;
-        //        item.contact = emp.contact;
-        //        item.price = emp.price;
-        //        if (emp.images != null)
-        //        {
-        //            item.images.AddRange(emp.images);
-        //        }
+        public ItemStadium getInfoStadium(string token, string name)
+        {
+            using (DataContext context = new DataContext())
+            {
+                SqlUser? user = context.users!.Where(s => s.IsDeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if (user == null)
+                {
+                    return new ItemStadium();
+                }
+                
+                SqlStadium? emp = context.sqlStadium!.Where(s => s.isDelete == false && s.name.CompareTo(name) == 0).FirstOrDefault();
+                if (emp == null)
+                {
+                    return new ItemStadium();
+                }
+                ItemStadium item = new ItemStadium();
+                item.name = emp.name;
+                item.address = emp.address;
+                item.contact = emp.contact;
+                item.price = emp.price;
+                if (emp.images != null)
+                {
+                    item.images.AddRange(emp.images);
+                }
 
-        //        return item;
-        //    }
-        //}
+                return item;
+            }
+        }
     }
  }

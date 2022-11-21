@@ -28,7 +28,6 @@ namespace BackEnd_Football.APIs
 
         public class M_order
         {
-            public int ordertime { get; set; } = 0;
             public string starttime { get; set; } = "";
             public string endtime { get; set; } = "";
             public string m_stadium { get; set; } = "";
@@ -51,7 +50,7 @@ namespace BackEnd_Football.APIs
                     return "";
                 }
 
-                SqlStadium? stadium = context.sqlStadium!.Where(s => s.isDelete == false && s.state!.code == 2 && s.name.CompareTo(m_order.m_stadium) == 0).Include(s => s.state).FirstOrDefault();
+                SqlStadium? stadium = context.sqlStadium!.Include(s => s.state).Where(s => s.isDelete == false && s.state!.code == 2 && s.name.CompareTo(m_order.m_stadium) == 0).FirstOrDefault();
                 if (stadium == null)
                 {
                     return "";
@@ -71,7 +70,7 @@ namespace BackEnd_Football.APIs
                     DateTime time;
                     if (DateTime.TryParse(m_order.starttime, CultureInfo.CurrentCulture, DateTimeStyles.None, out time))
                     {
-                        order.startTime = time.ToUniversalTime();
+                        order.startTime = time;
                     }
                     else
                     {
@@ -87,7 +86,7 @@ namespace BackEnd_Football.APIs
                     DateTime time;
                     if (DateTime.TryParse(m_order.endtime, CultureInfo.CurrentCulture, DateTimeStyles.None, out time))
                     {
-                        order.endTime = time.ToUniversalTime();
+                        order.endTime = time;
                     }
                     else
                     {
@@ -98,8 +97,8 @@ namespace BackEnd_Football.APIs
                 {
                     order.endTime = DateTime.MinValue.ToUniversalTime();
                 }
-                order.orderTime = m_order.ordertime;
-                order.price = stadium.price * m_order.ordertime;
+                order.orderTime = 1.5f;
+                order.price = stadium.price * 1.5f;
 
                 order.isFinish = false;
                 order.isDelete = false;
@@ -108,7 +107,7 @@ namespace BackEnd_Football.APIs
                 order.stadiumOrder = stadium;
                 order.userManagerOrder = manager;
 
-                stadium.state = context.sqlStates!.Where(s => s.isdeleted == false && s.code == 1).FirstOrDefault();
+                //order.stateOrder = context.sqlStates!.Where(s => s.isdeleted == false && s.code == 1).FirstOrDefault();
                 context.sqlOrderStadium!.Add(order);
                 int rows = await context.SaveChangesAsync();
                 if (rows > 0)
@@ -147,7 +146,7 @@ namespace BackEnd_Football.APIs
                 {
                     return "";
                 }
-                order.orderTime = m_order.ordertime;
+                //order.orderTime = m_order.ordertime;
                 try
                 {
                     DateTime time;
@@ -181,7 +180,7 @@ namespace BackEnd_Football.APIs
                     order.endTime = DateTime.MinValue.ToUniversalTime();
                 }
 
-                order.price = stadium.price * m_order.ordertime;
+                //order.price = stadium.price * m_order.ordertime;
 
 
                 order.stadiumOrder = stadium;
@@ -239,12 +238,13 @@ namespace BackEnd_Football.APIs
         public class infoOrder
         {
             public string nameStadium { get; set; } = "";
-            public int priceStadium { get; set; }
+            public string code { get; set; } = "";
+            public float priceStadium { get; set; }
             public string date { get; set; } = "";
-            public int orderTime { get; set; }
+            public float orderTime { get; set; }
             public string startTime { get; set; } = "";
             public string endTime { get; set; } = "";
-            public int price { get; set; }
+            public float price { get; set; }
             public string state { get; set; } = "";
             public string address { get; set; } = "";
         }
@@ -277,6 +277,42 @@ namespace BackEnd_Football.APIs
                 return items;
             }
         }
+        public List<order> getListAllOrder(string token, DateTime time)
+        {
+            using (DataContext context = new DataContext())
+            {
+
+                //DateTime start_time = DateTime.ParseExact(time, "yyyy/MM/dd HH:mm:ss", null);
+                List<order> items = new List<order>();
+                SqlUser? m_user = context.users!.Where(s => s.IsDeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if (m_user == null)
+                {
+                    return new List<order>();
+                }
+
+                Console.WriteLine(time);
+                
+                List<SqlOrderStadium> orders = context.sqlOrderStadium!
+                                                      .Include(s => s.stateOrder)
+                                                      .Where(s => s.isDelete == false  && s.stateOrder!.code == 1 && DateTime.Compare(s.startTime.Date, time.Date) == 0)
+                                                      .Include(s => s.stadiumOrder).ToList();
+                if(orders.Count <= 0)
+                {
+                    return new List<order>();
+                }
+                foreach (SqlOrderStadium tmp in orders)
+                {
+                    order item = new order();
+                    item.date = tmp.startTime.ToLocalTime().ToString("dd/MM/yyyy");
+                    item.time = tmp.startTime.ToLocalTime().ToString("HH:mm");
+                    item.nameStadium = tmp.stadiumOrder!.name;
+                    item.code = tmp.code;
+                    items.Add(item);
+                }
+                return items;
+            }
+        }
+
         public infoOrder GetInfoOrderForCustomer(string token, string code)
         {
             using (DataContext context = new DataContext())
@@ -299,9 +335,10 @@ namespace BackEnd_Football.APIs
                     return new infoOrder();
                 }
 
+                temp.code = m_order.code;
                 temp.nameStadium = m_order.stadiumOrder!.name;
                 temp.date = m_order.startTime.ToLocalTime().ToString("dd/MM/yyyy");
-                temp.orderTime = m_order.orderTime;
+                temp.orderTime = 1.5f;
                 temp.startTime = m_order.startTime.ToLocalTime().ToString("HH:mm");
                 temp.endTime = m_order.endTime.ToLocalTime().ToString("HH:mm");
                 temp.price = m_order.price;

@@ -79,5 +79,22 @@ namespace BackEnd_Football.Controllers
                 return BadRequest();
             }
         }
+
+        [HttpGet]
+        [Route("listAllOrder")]
+        public IActionResult listAllOrder([FromHeader] string token, string time)
+        {
+            DateTime m_time = DateTime.MinValue;
+            try
+            {
+                m_time = DateTime.ParseExact(time, "dd/MM/yyyy", null);
+            }
+            catch (Exception e)
+            {
+                m_time = DateTime.MaxValue;
+            }
+
+            return Ok(Program.api_orderStadium.getListAllOrder(token, m_time));
+        }
     }
 }

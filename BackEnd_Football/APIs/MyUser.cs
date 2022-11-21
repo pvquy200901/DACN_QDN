@@ -129,7 +129,7 @@ namespace BackEnd_Football.APIs
                 teamp.Email = email;
                 teamp.ChucVu = false;
                 teamp.token = createToken();
-
+                teamp.SqlState = context.sqlStates!.Where(s => s.isdeleted == false && s.code == 0).FirstOrDefault();
                 context.users!.Add(teamp);
 
                 int rows = await context.SaveChangesAsync();
@@ -207,9 +207,9 @@ namespace BackEnd_Football.APIs
             }
         }
 
-        public async Task<bool> createAsync(string token, string name, string shortName, int quantity, string address, string phone, string des)
+        public async Task<bool> createAsync(string token, string name, string shortName,  string address, string phone, string des)
         {
-            if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(name) || string.IsNullOrEmpty(shortName) || quantity == 0 || string.IsNullOrEmpty(address) || string.IsNullOrEmpty(phone) || string.IsNullOrEmpty(des))
+            if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(name)  || string.IsNullOrEmpty(phone))
             {
                 return false;
             }
@@ -220,12 +220,13 @@ namespace BackEnd_Football.APIs
                 {
                     return false;
                 }
-                
+
                 SqlTeam? team = context.SqlTeams!.Where(s => s.isdeleted == false && s.name.CompareTo(name) == 0).FirstOrDefault();
                 if (team != null)
                 {
                     return false;
                 }
+                SqlState? state = context.sqlStates!.Where(s => s.isdeleted == false && s.code == 1).FirstOrDefault();
                 team = new SqlTeam();
                 team.id = DateTime.Now.Ticks;
                 team.name = name;
@@ -237,9 +238,10 @@ namespace BackEnd_Football.APIs
                 team.address = address;
                 team.createdTime = DateTime.Now.ToUniversalTime();
                 team.userCreateTeam = m_user;
-                
+                m_user.SqlState = state;
+
                 context.SqlTeams!.Add(team);
-                
+
 
                 m_user.ChucVu = true;
                 m_user.SqlTeam = team;
@@ -255,7 +257,7 @@ namespace BackEnd_Football.APIs
             }
         }
 
-        public async Task<bool> editAsync(string token,string name, string shortName, int quantity, string address, string phone, string des)
+        public async Task<bool> editAsync(string token, string name, string shortName, int quantity, string address, string phone, string des)
         {
             if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(name))
             {
@@ -263,7 +265,7 @@ namespace BackEnd_Football.APIs
             }
             using (DataContext context = new DataContext())
             {
-                
+
                 SqlTeam? team = context.SqlTeams!.Where(s => s.isdeleted == false && s.name.CompareTo(name) == 0 && s.userCreateTeam!.token.CompareTo(token) == 0).FirstOrDefault();
                 if (team == null)
                 {
@@ -285,9 +287,9 @@ namespace BackEnd_Football.APIs
                 {
                     team!.name = name;
                 }
-                
-                    team!.quantity = quantity;
-                
+
+                team!.quantity = quantity;
+
                 if (!String.IsNullOrEmpty(address))
                 {
                     team!.address = address;
@@ -336,39 +338,39 @@ namespace BackEnd_Football.APIs
             }
         }
 
-        public async Task<bool> removeUserInTeam(string token,string team, string name)
+        public async Task<bool> removeUserInTeam(string token, string team, string name)
         {
-            using(DataContext context = new DataContext())
+            using (DataContext context = new DataContext())
             {
                 SqlUser? captain = context.users!.Where(s => s.IsDeleted == false && s.token.CompareTo(token) == 0)
                                                 .Include(s => s.SqlTeam!).ThenInclude(s => s.user)
                                                 .FirstOrDefault();
-                if(captain == null)
+                if (captain == null)
                 {
                     return false;
                 }
                 SqlTeam? i_team = null;
 
-                if(captain.ChucVu == true)
+                if (captain.ChucVu == true)
                 {
-                    SqlTeam? m_team = context.SqlTeams!.Where(s=> s.isdeleted == false && s.name.CompareTo(team) == 0)
-                                                    .Include(s => s.userCreateTeam)
+                    SqlTeam? m_team = context.SqlTeams!.Include(s => s.userCreateTeam)
+                                                    .Where(s => s.isdeleted == false && s.name.CompareTo(team) == 0 && s.userCreateTeam!.token.CompareTo(token) == 0)
                                                   .Include(s => s.user)
                                                .FirstOrDefault();
-                    if(m_team == null)
+                    if (m_team == null)
                     {
                         return false;
                     }
-                    if(m_team.user == null)
+                    if (m_team.user == null)
                     {
                         return false;
                     }
-                    
-                    if(m_team.user.Count> 0)
-                    {
-                        SqlUser? tmpUser = m_team.user!.Where(s => s.IsDeleted == false && s.token.CompareTo(name) == 0).FirstOrDefault();
 
-                        if(tmpUser == null)
+                    if (m_team.user.Count > 0)
+                    {
+                        SqlUser? tmpUser = m_team.user!.Where(s => s.IsDeleted == false && s.username.CompareTo(name) == 0).FirstOrDefault();
+
+                        if (tmpUser == null)
                         {
                             return false;
                         }
@@ -393,24 +395,25 @@ namespace BackEnd_Football.APIs
         }
         public async Task<bool> joinTeamAsync(string token, string team)
         {
-            using(DataContext context = new DataContext())
+            using (DataContext context = new DataContext())
             {
-                SqlUser? user = context.users!.Where(s => s.IsDeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
-                if(user == null)
+                SqlUser? user = context.users!.Include(s => s.SqlState).Where(s => s.IsDeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if (user == null)
                 {
                     return false;
                 }
-                SqlTeam? L_team = context.SqlTeams!.Where(s => s.isdeleted == false && s.name.CompareTo(team) == 0).FirstOrDefault();          
-            
-                if(L_team == null)
+                SqlTeam? L_team = context.SqlTeams!.Where(s => s.isdeleted == false && s.name.CompareTo(team) == 0).FirstOrDefault();
+
+                if (L_team == null)
                 {
                     return false;
                 }
 
-                if(user.SqlTeam == null)
+                if (user.SqlTeam == null)
                 {
                     user.SqlTeam = L_team;
                     L_team.quantity += 1;
+                    user.SqlState = context.sqlStates!.Where(s => s.isdeleted == false && s.code == 4).FirstOrDefault();
                 }
 
                 int rows = await context.SaveChangesAsync();
@@ -445,6 +448,7 @@ namespace BackEnd_Football.APIs
                 {
                     user.SqlTeam = null;
                     L_team.quantity -= 1;
+                    user.SqlState = context.sqlStates!.Where(s => s.isdeleted == false && s.code == 0).FirstOrDefault();
                 }
 
                 int rows = await context.SaveChangesAsync();
@@ -466,46 +470,185 @@ namespace BackEnd_Football.APIs
             public string phone { get; set; } = "";
             public string email { get; set; } = "";
             public string birthday { get; set; } = "";
+            public string username { get; set; } = "";
+            public bool chucVu { get; set; } = false;
         }
 
-        public List<userInTeam> listUserInTeam(string token)
+        public List<userInTeam> listUserInTeam(string team)
         {
-            using(DataContext context = new DataContext())
+            using (DataContext context = new DataContext())
             {
-                SqlUser? m_user = context.users!.Where(s => s.IsDeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
-                if(m_user == null)
+                List<SqlUser>? m_user = context.users!.Include(s => s.SqlTeam).Include(s => s.SqlState)
+                                                       .Where(s => s.IsDeleted == false && s.SqlTeam!.name.CompareTo(team) == 0 && s.SqlState!.code == 1)
+                                                       .ToList();
+                if (m_user == null)
                 {
                     return new List<userInTeam>();
                 }
-               
-                SqlTeam? m_team = context.SqlTeams!.Include(s => s.user)
-                                                    .Where(s => s.isdeleted == false  && s.userCreateTeam!.token.CompareTo(token) == 0)
-                                                    .FirstOrDefault();
-                List<userInTeam> myUser = new List<userInTeam>();
-                if(m_team != null)
-                {
-                    if (m_team.user != null)
-                    {
-                        foreach (SqlUser tmp in m_team.user)
-                        {
-                            userInTeam temp = new userInTeam();
-                            temp.name = tmp.Name;
-                            temp.avatar = tmp.PhotoURL;
-                            temp.phone = tmp.Phone;
-                            temp.email = tmp.Email;
-                            temp.birthday = tmp.birthday.ToLocalTime().ToString("dd/MM/yyyy");
 
-                            myUser.Add(temp);
-                        }
-                    }
-                    else
-                    {
-                        return new List<userInTeam>();
-                    }
+
+                List<userInTeam> myUser = new List<userInTeam>();
+
+                foreach (SqlUser tmp in m_user)
+                {
+                    userInTeam temp = new userInTeam();
+                    temp.name = tmp.Name;
+                    temp.avatar = tmp.PhotoURL;
+                    temp.phone = tmp.Phone;
+                    temp.email = tmp.Email;
+                    temp.birthday = tmp.birthday.ToLocalTime().ToString("dd/MM/yyyy");
+                    temp.chucVu = tmp.ChucVu;
+                    temp.username = tmp.username;
+
+                    myUser.Add(temp);
                 }
                 return myUser;
-
             }
+
+
+        }
+
+        public List<infoUser> listUserComing(string token, string team)
+        {
+            using (DataContext context = new DataContext())
+            {
+                SqlUser? captain = context.users!.Include(s => s.SqlTeam).ThenInclude(s => s.userCreateTeam).Where(s => s.IsDeleted == false && s.SqlTeam!.userCreateTeam!.token.CompareTo(token) == 0).FirstOrDefault();
+                List<SqlUser>? m_user = context.users!.Include(s => s.SqlTeam).Include(s => s.SqlState).Where(s => s.IsDeleted == false && s.SqlTeam!.name.CompareTo(team) == 0 && s.SqlState!.code == 4).ToList();
+                if (m_user == null)
+                {
+                    return new List<infoUser>();
+                }
+                List<infoUser> users = new List<infoUser>();
+                foreach (SqlUser tmp in m_user)
+                {
+                    infoUser temp = new infoUser();
+                    temp.name = tmp.Name;
+                    temp.avatar = tmp.PhotoURL;
+                    temp.phone = tmp.Phone;
+                    temp.email = tmp.Email;
+                    //temp.birthday = tmp.birthday.ToLocalTime().ToString("dd/MM/yyyy");
+                    temp.chucVu = tmp.ChucVu;
+                    temp.username = tmp.username;
+                    temp.team = tmp.SqlTeam!.name;
+                    temp.state = tmp.SqlState!.code;
+
+                    users.Add(temp);
+                }
+                return users;
+            }
+        }
+        public async Task<bool> acpUser(string token, string username)
+        {
+            using(DataContext context = new DataContext())
+            {
+                SqlUser? captain = context.users!.Include(s => s.SqlTeam).ThenInclude(s => s.userCreateTeam).Where(s => s.IsDeleted == false && s.SqlTeam!.userCreateTeam!.token.CompareTo(token) == 0).FirstOrDefault();
+                if (captain == null)
+                {
+                    return false;
+                }
+                SqlUser? m_user = context.users!.Where(s => s.IsDeleted == false && s.username.CompareTo(username) == 0).Include(s => s.SqlState).FirstOrDefault();
+
+                if(m_user == null)
+                {
+                    return false;
+                }
+
+                m_user.SqlState = context.sqlStates!.Where(s => s.isdeleted == false && s.code == 1).FirstOrDefault();
+
+                int rows = await context.SaveChangesAsync();
+                if (rows > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+        }
+
+        public async Task<bool> cancelUser(string token, string username)
+        {
+            using (DataContext context = new DataContext())
+            {
+                SqlUser? captain = context.users!.Include(s => s.SqlTeam).ThenInclude(s => s.userCreateTeam).Where(s => s.IsDeleted == false && s.SqlTeam!.userCreateTeam!.token.CompareTo(token) == 0).FirstOrDefault();
+                if (captain == null)
+                {
+                    return false;
+                }
+                SqlUser? m_user = context.users!.Where(s => s.IsDeleted == false && s.username.CompareTo(username) == 0).Include(s => s.SqlState).FirstOrDefault();
+
+                if (m_user == null)
+                {
+                    return false;
+                }
+
+                m_user.SqlTeam = null;
+                m_user.SqlState = context.sqlStates!.Where(s => s.isdeleted == false && s.code == 0).FirstOrDefault();
+
+                int rows = await context.SaveChangesAsync();
+                if (rows > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+        }
+
+
+
+        public class infoUser
+        {
+            public string name { get; set; } = "";
+            public string avatar { get; set; } = "";
+            public string email { get; set; } = "";
+            public string phone { get; set; } = "";
+            public bool chucVu { get; set; } = false;
+            public string team { get; set; } = "";
+            public string username { get; set; } = "";
+
+            public int state { get; set; }
+        }
+
+        public infoUser getInfoUser(string token)
+        {
+            DataContext context = new DataContext();
+
+            SqlUser? m_user = context.users!.Where(s => s.IsDeleted == false && s.token.CompareTo(token) == 0)
+                                            .Include(s => s.SqlTeam)
+                                            .Include(s => s.SqlState)
+                                            .FirstOrDefault();
+
+            if (m_user == null)
+            {
+                return new infoUser();
+            }
+
+
+            infoUser temp = new infoUser();
+            temp.name = m_user.Name;
+            temp.avatar = m_user.PhotoURL;
+            temp.email = m_user.Email;
+            temp.phone = m_user.Phone;
+            temp.chucVu = m_user.ChucVu;
+            temp.username = m_user.username;
+            temp.state = m_user.SqlState!.code;
+            if (m_user.SqlTeam == null)
+            {
+                temp.team = "";
+            }
+            else
+            {
+                temp.team = m_user.SqlTeam!.name;
+            }
+
+
+            return temp;
         }
     }
 }

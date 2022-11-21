@@ -295,6 +295,37 @@ namespace BackEnd_Football.APIs
             }
         }
 
+        public async Task<string> setAvatarAsync(string token, byte[] file)
+        {
+           
+            using (DataContext context = new DataContext())
+            {
+                SqlUser? user = context.users!.Where(s => s.IsDeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if (user == null)
+                {
+                    return "";
+                }
+
+                string code = await Program.api_myFile.saveFileAsync(string.Format("{0}.jpg", DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")), file);
+                if (string.IsNullOrEmpty(code))
+                {
+                    return "";
+                }
+
+                user.PhotoURL = code;
+
+                int rows = await context.SaveChangesAsync();
+                if (rows > 0)
+                {
+                    return code;
+                }
+                else
+                {
+                    return "";
+                }
+            }
+        }
+
         public class ItemTeam
         {
             public string name { get; set; } = "";
@@ -302,6 +333,7 @@ namespace BackEnd_Football.APIs
             public string phone { get; set; } = "";
             public string logo { get; set; } = "";
             public string des { get; set; } = "";
+            public string address { get; set; } = "";
             public int quality { get; set; }
             public List<string> imageTeam { get; set; } = new List<string>();
         }
@@ -321,6 +353,7 @@ namespace BackEnd_Football.APIs
                     item.logo = team.logo;
                     item.des = team.des;
                     item.quality = team.quantity;
+                    item.address = team.address;
                     if (team.imagesTeam != null)
                     {
                         item.imageTeam.AddRange(team.imagesTeam);

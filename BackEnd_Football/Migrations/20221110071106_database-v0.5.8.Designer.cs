@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using BackEnd_Football.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BackEnd_Football.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20221110071106_database-v0.5.8")]
+    partial class databasev058
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,9 +39,6 @@ namespace BackEnd_Football.Migrations
                     b.Property<string>("comments")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<bool>("isDelete")
-                        .HasColumnType("boolean");
 
                     b.Property<DateTime>("time")
                         .HasColumnType("timestamp with time zone");
@@ -156,11 +155,11 @@ namespace BackEnd_Football.Migrations
                     b.Property<bool>("isFinish")
                         .HasColumnType("boolean");
 
-                    b.Property<float>("orderTime")
-                        .HasColumnType("real");
+                    b.Property<int>("orderTime")
+                        .HasColumnType("integer");
 
-                    b.Property<float>("price")
-                        .HasColumnType("real");
+                    b.Property<int>("price")
+                        .HasColumnType("integer");
 
                     b.Property<long?>("stadiumOrderid")
                         .HasColumnType("bigint");
@@ -255,8 +254,8 @@ namespace BackEnd_Football.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<float>("price")
-                        .HasColumnType("real");
+                    b.Property<int>("price")
+                        .HasColumnType("integer");
 
                     b.Property<long?>("stateID")
                         .HasColumnType("bigint");

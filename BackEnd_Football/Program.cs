@@ -16,6 +16,9 @@ public class Program
     public static MyOrder api_orderStadium = new MyOrder();
     public static MyState api_state = new MyState();
     public static MyNews api_myNews = new MyNews();
+    public static MyComment api_commment = new MyComment();
+
+
     public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
@@ -47,6 +50,7 @@ public class Program
         builder.Services.AddSwaggerGen();
 
         var app = builder.Build();
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
         app.UseSwagger();
         app.UseSwaggerUI();

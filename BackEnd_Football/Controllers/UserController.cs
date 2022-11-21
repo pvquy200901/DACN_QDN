@@ -85,7 +85,7 @@ namespace BackEnd_Football.Controllers
         public async Task<IActionResult> createTeamAsync([FromHeader] string token, ItemHttpTeam team)
         {
 
-            bool flag = await Program.api_user.createAsync(token, team.name, team.shortName, team.quantity, team.address, team.phone, team.des);
+            bool flag = await Program.api_user.createAsync(token, team.name, team.shortName, team.address, team.phone, team.des);
             if (flag)
             {
                 return Ok();
@@ -151,6 +151,42 @@ namespace BackEnd_Football.Controllers
         }
 
         [HttpPut]
+        [Route("acpUser")]
+        public async Task<IActionResult> acpUserAsync([FromHeader] string token, string username)
+        {
+
+
+            bool flag = await Program.api_user.acpUser(token, username);
+            if (flag)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
+
+        }
+
+        [HttpPut]
+        [Route("CancelUser")]
+        public async Task<IActionResult> cancelUserAsync([FromHeader] string token, string username)
+        {
+
+
+            bool flag = await Program.api_user.cancelUser(token, username);
+            if (flag)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
+
+        }
+
+        [HttpPut]
         [Route("outTeam")]
         public async Task<IActionResult> outTeamAsync([FromHeader] string token, string team)
         {
@@ -191,9 +227,16 @@ namespace BackEnd_Football.Controllers
 
         [HttpGet]
         [Route("getListUserInTeam")]
-        public IActionResult listUserInTeam([FromHeader] string token)
+        public IActionResult listUserInTeam(string team)
         {
-            return Ok(Program.api_user.listUserInTeam(token));
+            return Ok(Program.api_user.listUserInTeam(team));
+        }
+
+        [HttpGet]
+        [Route("getListUserComing")]
+        public IActionResult listUserComing([FromHeader] string token,string team)
+        {
+            return Ok(Program.api_user.listUserComing(token, team));
         }
 
         [HttpGet]
@@ -281,6 +324,29 @@ namespace BackEnd_Football.Controllers
            
         }
 
+
+
+        [HttpPut]
+        [Route("setAvatarUser")]
+        public async Task<IActionResult> setAvatarUserAsync([FromHeader] string token,  IFormFile image)
+        {
+
+            using (MemoryStream ms = new MemoryStream())
+            {
+                image.CopyTo(ms);
+                string code = await Program.api_myTeam.setAvatarAsync(token, ms.ToArray());
+                if (string.IsNullOrEmpty(code))
+                {
+                    return BadRequest();
+                }
+                else
+                {
+                    return Ok(code);
+                }
+            }
+
+        }
+
         [HttpGet]
         [Route("listOrder")]
         public IActionResult listOrder([FromHeader] string token)
@@ -288,5 +354,28 @@ namespace BackEnd_Football.Controllers
 
             return Ok(Program.api_orderStadium.getListOrder(token));
         }
+
+        [HttpGet]
+        [Route("getInfoUser")]
+        public IActionResult getInfoUser([FromHeader] string token)
+        {
+            return Ok(Program.api_user.getInfoUser(token));
+        }
+
+        [HttpGet]
+        [Route("getInfoStadium")]
+        public IActionResult getInfoStadium([FromHeader] string token, string name)
+        {
+            return Ok(Program.api_myStadium.getInfoStadium(token, name));
+        }
+
+        [HttpGet]
+        [Route("listNews")]
+        public IActionResult listNews([FromHeader] string token)
+        {
+
+            return Ok(Program.api_myNews.getListNewsForUser(token));
+        }
+
     }
 }

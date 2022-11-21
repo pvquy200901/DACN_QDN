@@ -61,7 +61,7 @@ namespace BackEnd_Football.APIs
                 news.description = m_news.description;
                 news.shortDes = m_news.shortDes;
                 news.code = generatorcode();
-                news.createdTime = DateTime.Now.ToUniversalTime();
+                news.createdTime = DateTime.Now;
 
                 news.state = state;
                 news.user = user;
@@ -293,6 +293,8 @@ namespace BackEnd_Football.APIs
             public string title { get; set; } = "";
             public string shortDes { get; set; } = "";
             public string createdTime { get; set; } = "";
+            public string Time { get; set; } = "";
+
         }
 
         //Lấy danh sách các news cần phê duyệt  -admin
@@ -340,9 +342,29 @@ namespace BackEnd_Football.APIs
             }
         }
 
-        //Image
 
-        public async Task<string> addImageNewsAsync(string code, byte[] file)
+        public List<ItemNews> getListNewsForUser(string token)
+        {
+            using (DataContext context = new DataContext())
+            {
+                List<ItemNews> l_items = new List<ItemNews>();
+                List<SqlNews> listNews = context.sqlNews!.Include(s => s.user).Where(s => s.state!.code == 5 && s.user!.IsDeleted == false && s.user!.token.CompareTo(token) == 0).ToList();
+                foreach (SqlNews news in listNews)
+                {
+                    ItemNews itemNews = new ItemNews();
+                    itemNews.code = news.code;
+                    itemNews.title = news.title;
+                    itemNews.shortDes = news.shortDes;
+                    itemNews.createdTime = news.createdTime.ToString("dd/MM/yyyy");
+                    itemNews.Time = news.createdTime.ToString("HH:mm");
+                    l_items.Add(itemNews);
+                }
+                return l_items;
+            }
+        }
+            //Image
+
+            public async Task<string> addImageNewsAsync(string code, byte[] file)
         {
             if (string.IsNullOrEmpty(code))
             {
