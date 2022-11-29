@@ -10,7 +10,7 @@ namespace BackEnd_Football.APIs
         {
 
         }
-        public string generatorcode()
+        public static string generatorcode()
         {
             using (DataContext context = new DataContext())
             {

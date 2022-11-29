@@ -1,5 +1,7 @@
 ﻿using BackEnd_Football.Models;
 using Microsoft.EntityFrameworkCore;
+using static BackEnd_Football.APIs.MyOrder;
+using System.Globalization;
 
 namespace BackEnd_Football.APIs
 {
@@ -413,6 +415,94 @@ namespace BackEnd_Football.APIs
                 {
                     return user.ID;
                 }
+            }
+        }
+
+        public async Task<string> createOrderSysAsync(string token, M_order m_order)
+        {
+            using (DataContext context = new DataContext())
+            {
+                SqlUserSystem? user = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if (user == null)
+                {
+                    return "";
+                }
+
+                SqlState? state = context.sqlStates!.Where(s => s.code == 1 && s.isdeleted == false).FirstOrDefault();
+                if (state == null)
+                {
+                    return "";
+                }
+
+                SqlStadium? stadium = context.sqlStadium!.Include(s => s.state).Where(s => s.isDelete == false && s.state!.code == 2 && s.name.CompareTo(m_order.m_stadium) == 0).FirstOrDefault();
+                if (stadium == null)
+                {
+                    return "";
+                }
+              /*  SqlUserSystem? manager = context.sqlUserSystems!.Where(s => s.isdeleted == false).FirstOrDefault();
+                if (manager == null)
+                {
+                    return "";
+                }*/
+                SqlOrderStadium order = new SqlOrderStadium();
+                order.id = DateTime.Now.Ticks;
+              
+                order.code = generatorcode();
+
+                try
+                {
+                    DateTime time;
+                    if (DateTime.TryParse(m_order.starttime, CultureInfo.CurrentCulture, DateTimeStyles.None, out time))
+                    {
+                        order.startTime = time;
+                    }
+                    else
+                    {
+                        order.startTime = DateTime.MinValue.ToUniversalTime();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    order.startTime = DateTime.MinValue.ToUniversalTime();
+                }
+                try
+                {
+                    DateTime time;
+                    if (DateTime.TryParse(m_order.endtime, CultureInfo.CurrentCulture, DateTimeStyles.None, out time))
+                    {
+                        order.endTime = time;
+                    }
+                    else
+                    {
+                        order.endTime = DateTime.MinValue.ToUniversalTime();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    order.endTime = DateTime.MinValue.ToUniversalTime();
+                }
+                order.orderTime = 1.5f;
+                order.price = stadium.price * 1.5f;
+
+                order.isFinish = false;
+                order.isDelete = false;
+
+                order.stateOrder = state;
+                order.stadiumOrder = stadium;
+                order.userManagerOrder = user;
+
+                //order.stateOrder = context.sqlStates!.Where(s => s.isdeleted == false && s.code == 1).FirstOrDefault();
+                context.sqlOrderStadium!.Add(order);
+                int rows = await context.SaveChangesAsync();
+                if (rows > 0)
+                {
+                    return order.code;
+                }
+                else
+                {
+                    return "";
+                }
+
             }
         }
 

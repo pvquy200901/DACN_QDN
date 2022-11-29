@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using static BackEnd_Football.APIs.MyOrder;
 
 namespace BackEnd_Football.Controllers
 {
@@ -369,6 +370,21 @@ namespace BackEnd_Football.Controllers
             else
             {
                 return Unauthorized();
+            }
+        }
+
+        [HttpPost]
+        [Route("createOrder")]
+        public async Task<IActionResult> CreateOrderSysAsync([FromHeader] string token, M_order m_Order)
+        {
+            string order = await Program.api_userSystem.createOrderSysAsync(token, m_Order);
+            if (string.IsNullOrEmpty(order))
+            {
+                return BadRequest();
+            }
+            else
+            {
+                return Ok(order);
             }
         }
 
