@@ -20,7 +20,6 @@ namespace BackEnd_Football.Models
         public SqlUser? userOrder { get; set; }
         public SqlStadium? stadiumOrder { get; set; }
         public SqlUserSystem? userManagerOrder { get; set; }
-        
 
     }
    

@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BackEnd_Football.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20221110071106_database-v0.5.8")]
-    partial class databasev058
+    [Migration("20221130095700_database-v0.5.11")]
+    partial class databasev0511
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -39,6 +39,9 @@ namespace BackEnd_Football.Migrations
                     b.Property<string>("comments")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<bool>("isDelete")
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime>("time")
                         .HasColumnType("timestamp with time zone");
@@ -81,6 +84,56 @@ namespace BackEnd_Football.Migrations
                     b.HasKey("ID");
 
                     b.ToTable("File");
+                });
+
+            modelBuilder.Entity("BackEnd_Football.Models.SqlFoodDrink", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("SqlOrderFDid")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("amount")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("createTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("isDelete")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<float>("price")
+                        .HasColumnType("real");
+
+                    b.Property<float>("sellPrice")
+                        .HasColumnType("real");
+
+                    b.Property<long?>("stateID")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("updateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("userSystemID")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SqlOrderFDid");
+
+                    b.HasIndex("stateID");
+
+                    b.HasIndex("userSystemID");
+
+                    b.ToTable("FoodDrink");
                 });
 
             modelBuilder.Entity("BackEnd_Football.Models.SqlNews", b =>
@@ -134,6 +187,45 @@ namespace BackEnd_Football.Migrations
                     b.ToTable("News");
                 });
 
+            modelBuilder.Entity("BackEnd_Football.Models.SqlOrderFD", b =>
+                {
+                    b.Property<long>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("id"));
+
+                    b.Property<string>("code")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("createOrder")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("isDelete")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("isFinish")
+                        .HasColumnType("boolean");
+
+                    b.Property<long?>("orderStadiumid")
+                        .HasColumnType("bigint");
+
+                    b.Property<float>("price")
+                        .HasColumnType("real");
+
+                    b.Property<long?>("userManagerOrderID")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("orderStadiumid");
+
+                    b.HasIndex("userManagerOrderID");
+
+                    b.ToTable("OrderFD");
+                });
+
             modelBuilder.Entity("BackEnd_Football.Models.SqlOrderStadium", b =>
                 {
                     b.Property<long>("id")
@@ -155,11 +247,11 @@ namespace BackEnd_Football.Migrations
                     b.Property<bool>("isFinish")
                         .HasColumnType("boolean");
 
-                    b.Property<int>("orderTime")
-                        .HasColumnType("integer");
+                    b.Property<float>("orderTime")
+                        .HasColumnType("real");
 
-                    b.Property<int>("price")
-                        .HasColumnType("integer");
+                    b.Property<float>("price")
+                        .HasColumnType("real");
 
                     b.Property<long?>("stadiumOrderid")
                         .HasColumnType("bigint");
@@ -254,8 +346,8 @@ namespace BackEnd_Football.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("price")
-                        .HasColumnType("integer");
+                    b.Property<float>("price")
+                        .HasColumnType("real");
 
                     b.Property<long?>("stateID")
                         .HasColumnType("bigint");
@@ -482,6 +574,25 @@ namespace BackEnd_Football.Migrations
                     b.Navigation("useComments");
                 });
 
+            modelBuilder.Entity("BackEnd_Football.Models.SqlFoodDrink", b =>
+                {
+                    b.HasOne("BackEnd_Football.Models.SqlOrderFD", null)
+                        .WithMany("foodDrinks")
+                        .HasForeignKey("SqlOrderFDid");
+
+                    b.HasOne("BackEnd_Football.Models.SqlState", "state")
+                        .WithMany()
+                        .HasForeignKey("stateID");
+
+                    b.HasOne("BackEnd_Football.Models.SqlUserSystem", "userSystem")
+                        .WithMany()
+                        .HasForeignKey("userSystemID");
+
+                    b.Navigation("state");
+
+                    b.Navigation("userSystem");
+                });
+
             modelBuilder.Entity("BackEnd_Football.Models.SqlNews", b =>
                 {
                     b.HasOne("BackEnd_Football.Models.SqlUserSystem", "manager")
@@ -501,6 +612,21 @@ namespace BackEnd_Football.Migrations
                     b.Navigation("state");
 
                     b.Navigation("user");
+                });
+
+            modelBuilder.Entity("BackEnd_Football.Models.SqlOrderFD", b =>
+                {
+                    b.HasOne("BackEnd_Football.Models.SqlOrderStadium", "orderStadium")
+                        .WithMany()
+                        .HasForeignKey("orderStadiumid");
+
+                    b.HasOne("BackEnd_Football.Models.SqlUserSystem", "userManagerOrder")
+                        .WithMany()
+                        .HasForeignKey("userManagerOrderID");
+
+                    b.Navigation("orderStadium");
+
+                    b.Navigation("userManagerOrder");
                 });
 
             modelBuilder.Entity("BackEnd_Football.Models.SqlOrderStadium", b =>
@@ -581,6 +707,11 @@ namespace BackEnd_Football.Migrations
             modelBuilder.Entity("BackEnd_Football.Models.SqlNews", b =>
                 {
                     b.Navigation("comments");
+                });
+
+            modelBuilder.Entity("BackEnd_Football.Models.SqlOrderFD", b =>
+                {
+                    b.Navigation("foodDrinks");
                 });
 
             modelBuilder.Entity("BackEnd_Football.Models.SqlTeam", b =>

@@ -17,6 +17,8 @@ public class Program
     public static MyState api_state = new MyState();
     public static MyNews api_myNews = new MyNews();
     public static MyComment api_commment = new MyComment();
+    public static MyFoodDrink api_foodDrink = new MyFoodDrink();
+    public static MyOrderFoodDrink api_orderFD = new MyOrderFoodDrink();
 
 
     public static async Task Main(string[] args)
@@ -81,6 +83,8 @@ public class Program
         await api_myTeam.initAsync();
         await api_myStadium.initAsync();
         await api_state.initAsync();
+       // await api_foodDrink.initAsync();
+
 
         app.Run();
         

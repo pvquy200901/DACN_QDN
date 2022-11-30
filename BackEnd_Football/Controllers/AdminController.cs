@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using static BackEnd_Football.APIs.MyFoodDrink;
 using static BackEnd_Football.APIs.MyOrder;
 
 namespace BackEnd_Football.Controllers
@@ -373,11 +374,115 @@ namespace BackEnd_Football.Controllers
             }
         }
 
+
+
+        //==================Tạo order bới quản lí============================================
         [HttpPost]
-        [Route("createOrder")]
+        [Route("createOrderStadium")]
         public async Task<IActionResult> CreateOrderSysAsync([FromHeader] string token, M_order m_Order)
         {
             string order = await Program.api_userSystem.createOrderSysAsync(token, m_Order);
+            if (string.IsNullOrEmpty(order))
+            {
+                return BadRequest();
+            }
+            else
+            {
+                return Ok(order);
+            }
+        }
+        //==================Quản lí food drink============================================
+        [HttpPost]
+        [Route("createFoodDrink")]
+        public async Task<IActionResult> CreateItemFDAsync([FromHeader] string token, M_foodDrink m_FoodDrink)
+        {
+            long id = Program.api_userSystem.checkAdmin(token);
+            if (id >= 0)
+            {
+                bool flag = await Program.api_foodDrink.createFDAsync(token, m_FoodDrink);
+                if (flag)
+                {
+                    return Ok(m_FoodDrink);
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        [HttpPost]
+        [Route("editFoodDrink")]
+        public async Task<IActionResult> editItemFDAsync([FromHeader] string token, long idFD, M_foodDrink m_FoodDrink)
+        {
+            long id = Program.api_userSystem.checkAdmin(token);
+            if (id >= 0)
+            {
+                bool flag = await Program.api_foodDrink.editFDAsync(token, idFD, m_FoodDrink);
+                if (flag)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        [HttpDelete]
+        [Route("deleteFoodDrink")]
+        public async Task<IActionResult> deleteItemFDAsync([FromHeader] string token, long idFD)
+        {
+            long id = Program.api_userSystem.checkAdmin(token);
+            if (id >= 0)
+            {
+                bool flag = await Program.api_foodDrink.deleteFDAsync(token, idFD);
+                if (flag)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        [HttpGet]
+        [Route("listFoodDrink")]
+        public IActionResult listFoodDrink(string token)
+        {
+            long id = Program.api_userSystem.checkUserSystem(token);
+            if (id >= 0)
+            {
+                return Ok(Program.api_foodDrink.getListFoodDrink());
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        //==================Tạo order đò ăn uống============================================
+
+        [HttpPost]
+        [Route("createOrderFD")]
+        public async Task<IActionResult> CreateOrderFDAsync([FromHeader] string token)
+        {
+            string order = await Program.api_orderFD.createOrderFDAsync(token);
             if (string.IsNullOrEmpty(order))
             {
                 return BadRequest();
