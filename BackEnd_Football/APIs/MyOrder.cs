@@ -386,7 +386,97 @@ namespace BackEnd_Football.APIs
 
             }
         }
+
+
+        
+        public List<order> getListOrderToDay(string token)
+        {
+            using (DataContext context = new DataContext())
+            {
+
+                
+                List<order> items = new List<order>();
+                SqlUserSystem? m_user = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if (m_user == null)
+                {
+                    return new List<order>();
+                }
+
+                Console.WriteLine(DateTime.Now.Date.ToString("MM/dd/yyyy"));
+
+                List<SqlOrderStadium> orders = context.sqlOrderStadium!
+                                                      .Include(s => s.stateOrder)
+                                                      .Where(s => s.isDelete == false && s.stateOrder!.code == 1 && DateTime.Compare(s.startTime.Date, DateTime.Now.Date) == 0)
+                                                      .Include(s => s.stadiumOrder).ToList();
+                if (orders.Count <= 0)
+                {
+                    return new List<order>();
+                }
+                foreach (SqlOrderStadium tmp in orders)
+                {
+                    order item = new order();
+                    item.date = tmp.startTime.ToLocalTime().ToString("dd/MM/yyyy");
+                    item.time = tmp.startTime.ToLocalTime().ToString("HH:mm") +"-"+  tmp.endTime.ToLocalTime().ToString("HH:mm");
+                    item.nameStadium = tmp.stadiumOrder!.name;
+                    item.code = tmp.code;
+                    items.Add(item);
+                }
+                return items;
+            }
+        }
+
+        public float getTotalPriceToday(string token)
+        {
+            float priceToday = 0f;
+            using (DataContext context = new DataContext())
+            {
+                
+                SqlUserSystem? m_user = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if(m_user == null)
+                {
+                    return 0f;
+                }
+                List<SqlOrderStadium> orders = context.sqlOrderStadium!
+                                                      .Include(s => s.stateOrder)
+                                                      .Where(s => s.isDelete == false && s.stateOrder!.code == 1 && DateTime.Compare(s.startTime.Date, DateTime.Now.Date) == 0)
+                                                      .Include(s => s.stadiumOrder).ToList();
+
+                foreach(SqlOrderStadium tmp in orders)
+                {
+                    priceToday += tmp.price;
+                }
+
+            }
+            return priceToday;
+        }
+
+        public float getTotalPriceMonth(string token)
+        {
+            float priceToday = 0f;
+            using (DataContext context = new DataContext())
+            {
+
+                SqlUserSystem? m_user = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if (m_user == null)
+                {
+                    return 0f;
+                }
+                List<SqlOrderStadium> orders = context.sqlOrderStadium!
+                                                      .Include(s => s.stateOrder)
+                                                      .Where(s => s.isDelete == false && s.stateOrder!.code == 1 && s.startTime.Month == DateTime.Now.Month)
+                                                      .Include(s => s.stadiumOrder).ToList();
+
+                foreach (SqlOrderStadium tmp in orders)
+                {
+                    priceToday += tmp.price;
+                }
+
+            }
+            return priceToday;
+        }
     }
+
+   
 
 
 

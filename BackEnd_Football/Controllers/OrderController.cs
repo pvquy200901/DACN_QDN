@@ -87,7 +87,7 @@ namespace BackEnd_Football.Controllers
             DateTime m_time = DateTime.MinValue;
             try
             {
-                m_time = DateTime.ParseExact(time, "dd/MM/yyyy", null);
+                m_time = DateTime.ParseExact(time, "MM/dd/yyyy", null);
             }
             catch (Exception e)
             {
@@ -95,6 +95,15 @@ namespace BackEnd_Football.Controllers
             }
 
             return Ok(Program.api_orderStadium.getListAllOrder(token, m_time));
+        }
+
+        [HttpGet]
+        [Route("listOrderToday")]
+        public IActionResult listOrderToday([FromHeader] string token)
+        {
+
+
+            return Ok(Program.api_orderStadium.getListOrderToDay(token));
         }
     }
 }

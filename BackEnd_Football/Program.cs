@@ -17,6 +17,8 @@ public class Program
     public static MyState api_state = new MyState();
     public static MyNews api_myNews = new MyNews();
     public static MyComment api_commment = new MyComment();
+    public static MyGmail api_gmail = new MyGmail();
+    public static MyGroupChat api_groupchat = new MyGroupChat();
 
 
     public static async Task Main(string[] args)

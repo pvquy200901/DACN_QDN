@@ -221,6 +221,12 @@ namespace BackEnd_Football.Controllers
             public string contact { get; set; } = "";
             public int price { get; set; }
         }
+        public class M_ItemStadium
+        {
+            public string address { get; set; } = "";
+            public string contact { get; set; } = "";
+            public int price { get; set; }
+        }
 
         [HttpPost]
         [Route("createStadium")]
@@ -247,12 +253,12 @@ namespace BackEnd_Football.Controllers
 
         [HttpPost]
         [Route("editStadium")]
-        public async Task<IActionResult> editStadiumAsync([FromHeader] string token, ItemHttpStadium stadium)
+        public async Task<IActionResult> editStadiumAsync([FromHeader] string token,string name, M_ItemStadium stadium)
         {
             long id = Program.api_userSystem.checkAdmin(token);
             if (id >= 0)
             {
-                bool flag = await Program.api_myStadium.editAsync(stadium.name, stadium.address, stadium.contact, stadium.price);
+                bool flag = await Program.api_myStadium.editAsync(token,name, stadium);
                 if (flag)
                 {
                     return Ok();
@@ -306,6 +312,21 @@ namespace BackEnd_Football.Controllers
         //    }
         //}
 
+        [HttpPut]
+        [Route("sendEmail")]
+        public async Task<IActionResult> sendEmailAsync(string email)
+        {
+            
+                    string code = await Program.api_gmail.sendEmailNotification(email);
+                    if (string.IsNullOrEmpty(code))
+                    {
+                        return BadRequest();
+                    }
+                    else
+                    {
+                        return Ok(code);
+                    }
+        }
 
         [HttpPut]
         [Route("addImageStadium")]
@@ -370,6 +391,89 @@ namespace BackEnd_Football.Controllers
             {
                 return Unauthorized();
             }
+        }
+
+        [HttpGet]
+        [Route("listUser")]
+        public IActionResult listUser([FromHeader] string token)
+        {
+            long id = Program.api_userSystem.checkUserSystem(token);
+            if (id >= 0)
+            {
+                return Ok(Program.api_userSystem.listUserForAdmin(token));
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        [HttpDelete]
+        [Route("revomeUser")]
+        public async Task<IActionResult> deleteUserAsync([FromHeader] string token,  string username)
+        {
+
+
+            bool flag = await Program.api_userSystem.removeUser(token, username);
+            if (flag)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
+
+        }
+
+        [HttpDelete]
+        [Route("revomeTeam")]
+        public async Task<IActionResult> deleteTeamAsync([FromHeader] string token, string team)
+        {
+
+
+            bool flag = await Program.api_userSystem.removeTeam(token, team);
+            if (flag)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
+
+        }
+
+        [HttpDelete]
+        [Route("revomeNews")]
+        public async Task<IActionResult> deleteNewsAsync([FromHeader] string token, string code)
+        {
+            bool flag = await Program.api_myNews.deleteNewsForAdminAsync(token, code);
+            if (flag)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
+
+        }
+
+        [HttpPut]
+        [Route("denyNews")]
+        public async Task<IActionResult> denyNewsAsync([FromHeader] string token, string code)
+        {
+            bool flag = await Program.api_myNews.denyNewsForAdminAsync(token, code);
+            if (flag)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
+
         }
 
     }

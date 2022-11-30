@@ -1,5 +1,6 @@
 ﻿using BackEnd_Football.Models;
 using Microsoft.EntityFrameworkCore;
+using static BackEnd_Football.APIs.MyUser;
 
 namespace BackEnd_Football.APIs
 {
@@ -416,5 +417,113 @@ namespace BackEnd_Football.APIs
             }
         }
 
+        public class itemUser
+        {
+            public string name { get; set; } = "";
+            public string phone { get; set; } = "";
+            public string email { get; set; } = "";
+            public string birthday { get; set; } = "";
+            public string username { get; set; } = "";
+        }
+        public List<itemUser> listUserForAdmin(string token)
+        {
+            using (DataContext context = new DataContext())
+            {
+
+                SqlUserSystem? admin = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if(admin == null)
+                {
+                    return new List<itemUser>();
+                }
+                List<SqlUser>? m_user = context.users!
+                                                       .Where(s => s.IsDeleted == false)
+                                                       .ToList();
+                if (m_user == null)
+                {
+                    return new List<itemUser>();
+                }
+
+
+                List<itemUser> myUser = new List<itemUser>();
+
+                foreach (SqlUser tmp in m_user)
+                {
+                    itemUser temp = new itemUser();
+                    temp.name = tmp.Name;
+                    temp.phone = tmp.Phone;
+                    temp.email = tmp.Email;
+                    temp.birthday = tmp.birthday.ToLocalTime().ToString("dd/MM/yyyy");
+                    temp.username = tmp.username;
+
+                    myUser.Add(temp);
+                }
+                return myUser;
+            }
+        }
+
+        public async Task<bool> removeUser(string token, string username)
+        {
+            using (DataContext context = new DataContext())
+            {
+                SqlUser? user = context.users!.Where(s => s.IsDeleted == false && s.username.CompareTo(username) == 0)
+                                                .FirstOrDefault();
+                if (user == null)
+                {
+                    return false;
+                }
+                SqlUserSystem? admin = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+
+                if (admin == null)
+                {
+                    return false;
+                }
+
+                user.IsDeleted = true;
+
+                int rows = await context.SaveChangesAsync();
+                if (rows > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
+        public async Task<bool> removeTeam(string token, string team)
+        {
+            using (DataContext context = new DataContext())
+            {
+                SqlTeam? m_team = context.SqlTeams!.Where(s => s.isdeleted == false && s.name.CompareTo(team) == 0)
+                                                .FirstOrDefault();
+                if (m_team == null)
+                {
+                    return false;
+                }
+                SqlUserSystem? admin = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+
+                if (admin == null)
+                {
+                    return false;
+                }
+
+                m_team.isdeleted = true;
+
+                int rows = await context.SaveChangesAsync();
+                if (rows > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
     }
+
+   
 }
