@@ -161,7 +161,7 @@ namespace BackEnd_Football.APIs
         }
 
 
-
+   
         public class ItemFoodDrink
         {
             public string idFD { get; set; } = "";
@@ -181,6 +181,7 @@ namespace BackEnd_Football.APIs
                 foreach (SqlFoodDrink news in listFD)
                 {
                     ItemFoodDrink itemFD = new ItemFoodDrink();
+                    itemFD.idFD = news.Id.ToString();
                     itemFD.name = news.name;
                     itemFD.amount = news.amount;
                     itemFD.price = news.price;

@@ -19,6 +19,7 @@ public class Program
     public static MyComment api_commment = new MyComment();
     public static MyFoodDrink api_foodDrink = new MyFoodDrink();
     public static MyOrderFoodDrink api_orderFD = new MyOrderFoodDrink();
+    public static MyItemOrderFoodDrink api_addItemOrderFD = new MyItemOrderFoodDrink();
 
 
     public static async Task Main(string[] args)

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using BackEnd_Football.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using static BackEnd_Football.APIs.MyFoodDrink;
 using static BackEnd_Football.APIs.MyOrder;
@@ -476,11 +477,13 @@ namespace BackEnd_Football.Controllers
             }
         }
 
-        //==================Tạo order đò ăn uống============================================
+        //==================Tạo order đò ăn uống===========================================
+
+        
 
         [HttpPost]
         [Route("createOrderFD")]
-        public async Task<IActionResult> CreateOrderFDAsync([FromHeader] string token)
+        public async Task<IActionResult> OrderFDCreateAsync([FromHeader] string token)
         {
             string order = await Program.api_orderFD.createOrderFDAsync(token);
             if (string.IsNullOrEmpty(order))
@@ -492,6 +495,129 @@ namespace BackEnd_Football.Controllers
                 return Ok(order);
             }
         }
+
+        [HttpPost]
+        [Route("editOrderFD")]
+        public async Task<IActionResult> OrderFDEditAsync([FromHeader] string token, string codeOrder)
+        {
+            string order = await Program.api_orderFD.editOrderFDAsync(token, codeOrder);
+            if (string.IsNullOrEmpty(order))
+            {
+                return BadRequest();
+            }
+            else
+            {
+                return Ok(order);
+            }
+        }
+
+        [HttpDelete]
+        [Route("deleteOrderFD")]
+        public async Task<IActionResult> OrderFDDeleteAsync([FromHeader] string token, string codeOrder)
+        {
+            long id = Program.api_userSystem.checkAdmin(token);
+            if (id >= 0)
+            {
+                bool flag = await Program.api_orderFD.deleteOrderFDAsync(token, codeOrder);
+                if (flag)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        [HttpGet]
+        [Route("listOrderFD")]
+        public IActionResult listOrderFD(string token)
+        {
+            long id = Program.api_userSystem.checkUserSystem(token);
+            if (id >= 0)
+            {
+                return Ok(Program.api_orderFD.getListOrderFD(token));
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        //==================Thêm các đồ ăn uống vào order đã tạo===========================================
+        [HttpPost]
+        [Route("addItemOrderFD")]
+        public async Task<IActionResult> addItemToOrderAsync([FromHeader] string token, string codeOrder, long idFD, int amount)
+        {
+            string order = await Program.api_addItemOrderFD.addItemOrderFDAsync(token,codeOrder, idFD,amount);
+            if (string.IsNullOrEmpty(order))
+            {
+                return BadRequest();
+            }
+            else
+            {
+                return Ok(order);
+            }
+        }
+        
+        [HttpPost]
+        [Route("editItemOrderFD")]
+        public async Task<IActionResult> editItemToOrderAsync([FromHeader] string token, long itemId, int amount)
+        {
+            string order = await Program.api_addItemOrderFD.editItemOrderFDAsync(token, itemId, amount);
+            if (string.IsNullOrEmpty(order))
+            {
+                return BadRequest();
+            }
+            else
+            {
+                return Ok(order);
+            }
+        }
+
+        [HttpDelete]
+        [Route("deleteItemOrderFD")]
+        public async Task<IActionResult> deleteItemToOrderAsync([FromHeader] string token, long itemId)
+        {
+            long id = Program.api_userSystem.checkAdmin(token);
+            if (id >= 0)
+            {
+                bool flag = await Program.api_addItemOrderFD.deleteItemOrderFDAsync(token, itemId);
+                if (flag)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        [HttpGet]
+        [Route("listItemOrderFD")]
+        public IActionResult listItemOrderFD(string token, string codeOrder)
+        {
+            long id = Program.api_userSystem.checkUserSystem(token);
+            if (id >= 0)
+            {
+                return Ok(Program.api_addItemOrderFD.getListItemOrderFD(token, codeOrder));
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
 
     }
 }

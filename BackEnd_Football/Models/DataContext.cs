@@ -21,7 +21,7 @@ namespace BackEnd_Football.Models
         public DbSet<SqlUser>? users { get; set; }
         public DbSet<SqlFoodDrink>? sqlFoodDrinks { get; set; }
         public DbSet<SqlOrderFD>? sqlOrderFDs { get; set; }
-       
+        public DbSet<ItemOrderFoodDrink>? itemFoodDrinks { get; set; }
         public DbSet<SqlUserSystem>? sqlUserSystems { get; set; }
         public DbSet<SqlTeam>? SqlTeams { get; set; }
         public DbSet<SqlState>? sqlStates { get; set; }
