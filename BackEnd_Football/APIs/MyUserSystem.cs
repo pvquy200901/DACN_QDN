@@ -1,5 +1,7 @@
 ﻿using BackEnd_Football.Models;
 using Microsoft.EntityFrameworkCore;
+using static BackEnd_Football.APIs.MyOrder;
+using static BackEnd_Football.APIs.MyStadium;
 using static BackEnd_Football.APIs.MyUser;
 
 namespace BackEnd_Football.APIs
@@ -520,6 +522,71 @@ namespace BackEnd_Football.APIs
                 {
                     return false;
                 }
+            }
+        }
+
+        public List<order> getListAllOrderForAdmin(string token, DateTime time)
+        {
+            using (DataContext context = new DataContext())
+            {
+
+                //DateTime start_time = DateTime.ParseExact(time, "yyyy/MM/dd HH:mm:ss", null);
+                List<order> items = new List<order>();
+                SqlUserSystem? m_user = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if (m_user == null)
+                {
+                    return new List<order>();
+                }
+
+                Console.WriteLine(time);
+
+                List<SqlOrderStadium> orders = context.sqlOrderStadium!
+                                                      .Include(s => s.stateOrder)
+                                                      .Where(s => s.isDelete == false && s.stateOrder!.code == 1 && DateTime.Compare(s.startTime.Date, time.Date) == 0)
+                                                      .Include(s => s.stadiumOrder).ToList();
+                if (orders.Count <= 0)
+                {
+                    return new List<order>();
+                }
+                foreach (SqlOrderStadium tmp in orders)
+                {
+                    order item = new order();
+                    item.date = tmp.startTime.ToLocalTime().ToString("dd/MM/yyyy");
+                    item.time = tmp.startTime.ToLocalTime().ToString("HH:mm");
+                    item.nameStadium = tmp.stadiumOrder!.name;
+                    item.code = tmp.code;
+                    items.Add(item);
+                }
+                return items;
+            }
+        }
+
+        public ItemStadium getInfoStadiumForAdmin(string token, string name)
+        {
+            using (DataContext context = new DataContext())
+            {
+                SqlUserSystem? user = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if (user == null)
+                {
+                    return new ItemStadium();
+                }
+
+                SqlStadium? emp = context.sqlStadium!.Where(s => s.isDelete == false && s.name.CompareTo(name) == 0).FirstOrDefault();
+                if (emp == null)
+                {
+                    return new ItemStadium();
+                }
+                ItemStadium item = new ItemStadium();
+                item.name = emp.name;
+                item.address = emp.address;
+                item.contact = emp.contact;
+                item.price = emp.price;
+                if (emp.images != null)
+                {
+                    item.images.AddRange(emp.images);
+                }
+
+                return item;
             }
         }
 

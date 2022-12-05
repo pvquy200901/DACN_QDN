@@ -474,10 +474,160 @@ namespace BackEnd_Football.APIs
             }
             return priceToday;
         }
+
+        public int getTotalOrderMonth(string token)
+        {
+            int orderMonth = 0;
+            using (DataContext context = new DataContext())
+            {
+
+                SqlUserSystem? m_user = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if (m_user == null)
+                {
+                    return 0;
+                }
+                List<SqlOrderStadium> orders = context.sqlOrderStadium!
+                                                      .Include(s => s.stateOrder)
+                                                      .Where(s => s.isDelete == false && s.stateOrder!.code == 1 && s.startTime.Month == DateTime.Now.Month)
+                                                      .Include(s => s.stadiumOrder).ToList();
+
+                orderMonth = orders.Count;
+
+            }
+            return orderMonth;
+        }
+
+        //public class M_order
+        //{
+        //    public string starttime { get; set; } = "";
+        //    public string endtime { get; set; } = "";
+        //    public string m_stadium { get; set; } = "";
+
+
+        //}
+        public async Task<string> createOrderForAdminAsync(string token, M_order m_order)
+        {
+            using (DataContext context = new DataContext())
+            {
+                SqlUserSystem? user = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if (user == null)
+                {
+                    return "";
+                }
+
+                SqlState? state = context.sqlStates!.Where(s => s.code == 1 && s.isdeleted == false).FirstOrDefault();
+                if (state == null)
+                {
+                    return "";
+                }
+
+                SqlStadium? stadium = context.sqlStadium!.Include(s => s.state).Where(s => s.isDelete == false && s.state!.code == 2 && s.name.CompareTo(m_order.m_stadium) == 0).FirstOrDefault();
+                if (stadium == null)
+                {
+                    return "";
+                }
+               
+                SqlOrderStadium order = new SqlOrderStadium();
+                order.id = DateTime.Now.Ticks;
+                order.userManagerOrder = user;
+                order.code = generatorcode();
+
+                try
+                {
+                    DateTime time;
+                    if (DateTime.TryParse(m_order.starttime, CultureInfo.CurrentCulture, DateTimeStyles.None, out time))
+                    {
+                        order.startTime = time;
+                    }
+                    else
+                    {
+                        order.startTime = DateTime.MinValue.ToUniversalTime();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    order.startTime = DateTime.MinValue.ToUniversalTime();
+                }
+                try
+                {
+                    DateTime time;
+                    if (DateTime.TryParse(m_order.endtime, CultureInfo.CurrentCulture, DateTimeStyles.None, out time))
+                    {
+                        order.endTime = time;
+                    }
+                    else
+                    {
+                        order.endTime = DateTime.MinValue.ToUniversalTime();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    order.endTime = DateTime.MinValue.ToUniversalTime();
+                }
+                order.orderTime = 1.5f;
+                order.price = stadium.price * 1.5f;
+
+                order.isFinish = false;
+                order.isDelete = false;
+
+                order.stateOrder = state;
+                order.stadiumOrder = stadium;
+
+                //order.stateOrder = context.sqlStates!.Where(s => s.isdeleted == false && s.code == 1).FirstOrDefault();
+                context.sqlOrderStadium!.Add(order);
+                int rows = await context.SaveChangesAsync();
+                if (rows > 0)
+                {
+                    return order.code;
+                }
+                else
+                {
+                    return "";
+                }
+
+            }
+
+           
+        }
+
+        public List<order> getListOrderFinishedInDay(string token)
+        {
+            using (DataContext context = new DataContext())
+            {
+
+
+                List<order> items = new List<order>();
+                SqlUserSystem? m_user = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if (m_user == null)
+                {
+                    return new List<order>();
+                }
+
+
+                List<SqlOrderStadium> orders = context.sqlOrderStadium!
+                                                      .Include(s => s.stateOrder)
+                                                      .Where(s => s.isDelete == false && s.isFinish == true  && DateTime.Compare(s.startTime.Date, DateTime.Now.Date) == 0)
+                                                      .Include(s => s.stadiumOrder)
+                                                      .OrderByDescending(s => s.startTime)
+                                                      .ToList();
+                if (orders.Count <= 0)
+                {
+                    return new List<order>();
+                }
+                foreach (SqlOrderStadium tmp in orders)
+                {
+                    order item = new order();
+                    item.date = tmp.startTime.ToLocalTime().ToString("dd/MM/yyyy");
+                    item.time = tmp.startTime.ToLocalTime().ToString("HH:mm") + "-" + tmp.endTime.ToLocalTime().ToString("HH:mm");
+                    item.nameStadium = tmp.stadiumOrder!.name;
+                    item.code = tmp.code;
+                    items.Add(item);
+                }
+                return items;
+            }
+        }
+
+
     }
-
-   
-
-
-
+    
 }

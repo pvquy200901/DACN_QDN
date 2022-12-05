@@ -476,5 +476,74 @@ namespace BackEnd_Football.Controllers
 
         }
 
+
+        [HttpGet]
+        [Route("getTotalPriceInDay")]
+        public IActionResult listTotalInDay([FromHeader] string token)
+        {
+            long id = Program.api_userSystem.checkUserSystem(token);
+            if (id >= 0)
+            {
+                return Ok(Program.api_orderStadium.getTotalPriceToday(token));
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        [HttpGet]
+        [Route("getTotalPriceInMonth")]
+        public IActionResult listTotalInMonth([FromHeader] string token)
+        {
+            long id = Program.api_userSystem.checkUserSystem(token);
+            if (id >= 0)
+            {
+                return Ok(Program.api_orderStadium.getTotalPriceMonth(token));
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        [HttpGet]
+        [Route("getTotalOrderInMonth")]
+        public IActionResult listTotalOrderInMonth([FromHeader] string token)
+        {
+            long id = Program.api_userSystem.checkUserSystem(token);
+            if (id >= 0)
+            {
+                return Ok(Program.api_orderStadium.getTotalOrderMonth(token));
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        [HttpGet]
+        [Route("listAllOrderForAdmin")]
+        public IActionResult listAllOrderForAdmin([FromHeader] string token, string time)
+        {
+            DateTime m_time = DateTime.MinValue;
+            try
+            {
+                m_time = DateTime.ParseExact(time, "MM/dd/yyyy", null);
+            }
+            catch (Exception e)
+            {
+                m_time = DateTime.MaxValue;
+            }
+
+            return Ok(Program.api_userSystem.getListAllOrderForAdmin(token, m_time));
+        }
+
+        [HttpGet]
+        [Route("getInfoStadiumForAdmin")]
+        public IActionResult getInfoStadiumForAdmin([FromHeader] string token, string name)
+        {
+            return Ok(Program.api_userSystem.getInfoStadiumForAdmin(token, name));
+        }
     }
 }
