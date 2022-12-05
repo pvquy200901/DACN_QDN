@@ -28,6 +28,21 @@ namespace BackEnd_Football.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("createOrderForAdmin")]
+        public async Task<IActionResult> CreateOrderForAdminAsync([FromHeader] string token, M_order m_Order)
+        {
+            string order = await Program.api_orderStadium.createOrderForAdminAsync(token, m_Order);
+            if (string.IsNullOrEmpty(order))
+            {
+                return BadRequest();
+            }
+            else
+            {
+                return Ok(order);
+            }
+        }
+
         [HttpPut]
         [Route("updateOrder")]
         public async Task<IActionResult> UpdateOrderAsync([FromHeader] string token,string code, M_order m_Order)
@@ -87,7 +102,7 @@ namespace BackEnd_Football.Controllers
             DateTime m_time = DateTime.MinValue;
             try
             {
-                m_time = DateTime.ParseExact(time, "dd/MM/yyyy", null);
+                m_time = DateTime.ParseExact(time, "MM/dd/yyyy", null);
             }
             catch (Exception e)
             {
@@ -95,6 +110,24 @@ namespace BackEnd_Football.Controllers
             }
 
             return Ok(Program.api_orderStadium.getListAllOrder(token, m_time));
+        }
+
+        [HttpGet]
+        [Route("listOrderToday")]
+        public IActionResult listOrderToday([FromHeader] string token)
+        {
+
+
+            return Ok(Program.api_orderStadium.getListOrderToDay(token));
+        }
+
+        [HttpGet]
+        [Route("listOrderFinishedToday")]
+        public IActionResult listOrderFinishedToday([FromHeader] string token)
+        {
+
+
+            return Ok(Program.api_orderStadium.getListOrderFinishedInDay(token));
         }
     }
 }

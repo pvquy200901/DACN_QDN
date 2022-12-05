@@ -1,5 +1,6 @@
 ﻿using BackEnd_Football.Models;
 using Microsoft.EntityFrameworkCore;
+using static BackEnd_Football.Controllers.AdminController;
 
 namespace BackEnd_Football.APIs
 {
@@ -91,26 +92,28 @@ namespace BackEnd_Football.APIs
             }
         }
 
-        public async Task<bool> editAsync(string name, string address, string contact, int price)
+        public async Task<bool> editAsync(string token,string name, M_ItemStadium stadium)
         {
-            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(address) || string.IsNullOrEmpty(contact))
+            if ( string.IsNullOrEmpty(stadium.address) || string.IsNullOrEmpty(stadium.contact))
             {
                 return false;
             }
             using (DataContext context = new DataContext())
             {
-                SqlStadium? stadium = context.sqlStadium!.Where(s => s.isDelete == false && s.name.CompareTo(name) == 0).FirstOrDefault();
-                if (stadium != null)
+                SqlUserSystem? sqlUserSystem = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if(sqlUserSystem == null)
                 {
                     return false;
                 }
-                stadium = new SqlStadium();
-                stadium.id = DateTime.Now.Ticks;
-                stadium.name = name;
-                stadium.address = address;
-                stadium.contact = contact;
-                stadium.price = price;
-                context.sqlStadium!.Add(stadium);
+                SqlStadium? m_stadium = context.sqlStadium!.Where(s => s.isDelete == false && s.name.CompareTo(name) == 0).FirstOrDefault();
+                if (m_stadium == null)
+                {
+                    return false;
+                }
+
+                m_stadium.address = stadium!.address;
+                m_stadium.contact = stadium.contact;
+                m_stadium.price = stadium.price;
 
                 int rows = await context.SaveChangesAsync();
                 if (rows > 0)
