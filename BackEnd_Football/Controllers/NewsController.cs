@@ -147,18 +147,7 @@ namespace BackEnd_Football.Controllers
         {
             return Ok(Program.api_myNews.getList_ConfirmedNews());
         }
-        [HttpGet]
-        [Route("listOKNewsForAdmin")]
-        public IActionResult listOKNews()
-        {
-            return Ok(Program.api_myNews.getListOKNewsForAdmin());
-        }
-        [HttpGet]
-        [Route("listDenyNews")]
-        public IActionResult listDenyNews()
-        {
-            return Ok(Program.api_myNews.getList_DeniedNews());
-        }
+
 
 
         //Images
