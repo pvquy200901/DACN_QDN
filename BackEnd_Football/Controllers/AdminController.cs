@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using BackEnd_Football.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using static BackEnd_Football.APIs.MyFoodDrink;
+using static BackEnd_Football.APIs.MyOrder;
 
 namespace BackEnd_Football.Controllers
 {
@@ -221,12 +224,6 @@ namespace BackEnd_Football.Controllers
             public string contact { get; set; } = "";
             public int price { get; set; }
         }
-        public class M_ItemStadium
-        {
-            public string address { get; set; } = "";
-            public string contact { get; set; } = "";
-            public int price { get; set; }
-        }
 
         [HttpPost]
         [Route("createStadium")]
@@ -253,12 +250,12 @@ namespace BackEnd_Football.Controllers
 
         [HttpPost]
         [Route("editStadium")]
-        public async Task<IActionResult> editStadiumAsync([FromHeader] string token,string name, M_ItemStadium stadium)
+        public async Task<IActionResult> editStadiumAsync([FromHeader] string token, ItemHttpStadium stadium)
         {
             long id = Program.api_userSystem.checkAdmin(token);
             if (id >= 0)
             {
-                bool flag = await Program.api_myStadium.editAsync(token,name, stadium);
+                bool flag = await Program.api_myStadium.editAsync(stadium.name, stadium.address, stadium.contact, stadium.price);
                 if (flag)
                 {
                     return Ok();
@@ -312,21 +309,6 @@ namespace BackEnd_Football.Controllers
         //    }
         //}
 
-        [HttpPut]
-        [Route("sendEmail")]
-        public async Task<IActionResult> sendEmailAsync(string email)
-        {
-            
-                    string code = await Program.api_gmail.sendEmailNotification(email);
-                    if (string.IsNullOrEmpty(code))
-                    {
-                        return BadRequest();
-                    }
-                    else
-                    {
-                        return Ok(code);
-                    }
-        }
 
         [HttpPut]
         [Route("addImageStadium")]
@@ -393,14 +375,63 @@ namespace BackEnd_Football.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("listUser")]
-        public IActionResult listUser([FromHeader] string token)
+
+
+        //==================Tạo order bới quản lí============================================
+        [HttpPost]
+        [Route("createOrderStadium")]
+        public async Task<IActionResult> CreateOrderSysAsync([FromHeader] string token, M_order m_Order)
         {
-            long id = Program.api_userSystem.checkUserSystem(token);
+            string order = await Program.api_userSystem.createOrderSysAsync(token, m_Order);
+            if (string.IsNullOrEmpty(order))
+            {
+                return BadRequest();
+            }
+            else
+            {
+                return Ok(order);
+            }
+        }
+        //==================Quản lí food drink============================================
+        [HttpPost]
+        [Route("createFoodDrink")]
+        public async Task<IActionResult> CreateItemFDAsync([FromHeader] string token, M_foodDrink m_FoodDrink)
+        {
+            long id = Program.api_userSystem.checkAdmin(token);
             if (id >= 0)
             {
-                return Ok(Program.api_userSystem.listUserForAdmin(token));
+                bool flag = await Program.api_foodDrink.createFDAsync(token, m_FoodDrink);
+                if (flag)
+                {
+                    return Ok(m_FoodDrink);
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        [HttpPost]
+        [Route("editFoodDrink")]
+        public async Task<IActionResult> editItemFDAsync([FromHeader] string token, long idFD, M_foodDrink m_FoodDrink)
+        {
+            long id = Program.api_userSystem.checkAdmin(token);
+            if (id >= 0)
+            {
+                bool flag = await Program.api_foodDrink.editFDAsync(token, idFD, m_FoodDrink);
+                if (flag)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest();
+                }
             }
             else
             {
@@ -409,82 +440,162 @@ namespace BackEnd_Football.Controllers
         }
 
         [HttpDelete]
-        [Route("revomeUser")]
-        public async Task<IActionResult> deleteUserAsync([FromHeader] string token,  string username)
+        [Route("deleteFoodDrink")]
+        public async Task<IActionResult> deleteItemFDAsync([FromHeader] string token, long idFD)
         {
-
-
-            bool flag = await Program.api_userSystem.removeUser(token, username);
-            if (flag)
+            long id = Program.api_userSystem.checkAdmin(token);
+            if (id >= 0)
             {
-                return Ok();
+                bool flag = await Program.api_foodDrink.deleteFDAsync(token, idFD);
+                if (flag)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest();
+                }
             }
             else
             {
+                return Unauthorized();
+            }
+        }
+
+        [HttpGet]
+        [Route("listFoodDrink")]
+        public IActionResult listFoodDrink(string token)
+        {
+            long id = Program.api_userSystem.checkUserSystem(token);
+            if (id >= 0)
+            {
+                return Ok(Program.api_foodDrink.getListFoodDrink());
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        //==================Tạo order đò ăn uống===========================================
+
+        
+
+        [HttpPost]
+        [Route("createOrderFD")]
+        public async Task<IActionResult> OrderFDCreateAsync([FromHeader] string token)
+        {
+            string order = await Program.api_orderFD.createOrderFDAsync(token);
+            if (string.IsNullOrEmpty(order))
+            {
                 return BadRequest();
             }
+            else
+            {
+                return Ok(order);
+            }
+        }
 
+        [HttpPost]
+        [Route("editOrderFD")]
+        public async Task<IActionResult> OrderFDEditAsync([FromHeader] string token, string codeOrder)
+        {
+            string order = await Program.api_orderFD.editOrderFDAsync(token, codeOrder);
+            if (string.IsNullOrEmpty(order))
+            {
+                return BadRequest();
+            }
+            else
+            {
+                return Ok(order);
+            }
         }
 
         [HttpDelete]
-        [Route("revomeTeam")]
-        public async Task<IActionResult> deleteTeamAsync([FromHeader] string token, string team)
+        [Route("deleteOrderFD")]
+        public async Task<IActionResult> OrderFDDeleteAsync([FromHeader] string token, string codeOrder)
         {
-
-
-            bool flag = await Program.api_userSystem.removeTeam(token, team);
-            if (flag)
+            long id = Program.api_userSystem.checkAdmin(token);
+            if (id >= 0)
             {
-                return Ok();
+                bool flag = await Program.api_orderFD.deleteOrderFDAsync(token, codeOrder);
+                if (flag)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest();
+                }
             }
             else
             {
+                return Unauthorized();
+            }
+        }
+
+        [HttpGet]
+        [Route("listOrderFD")]
+        public IActionResult listOrderFD(string token)
+        {
+            long id = Program.api_userSystem.checkUserSystem(token);
+            if (id >= 0)
+            {
+                return Ok(Program.api_orderFD.getListOrderFD(token));
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        //==================Thêm các đồ ăn uống vào order đã tạo===========================================
+        [HttpPost]
+        [Route("addItemOrderFD")]
+        public async Task<IActionResult> addItemToOrderAsync([FromHeader] string token, string codeOrder, long idFD, int amount)
+        {
+            string order = await Program.api_addItemOrderFD.addItemOrderFDAsync(token,codeOrder, idFD,amount);
+            if (string.IsNullOrEmpty(order))
+            {
                 return BadRequest();
             }
-
+            else
+            {
+                return Ok(order);
+            }
+        }
+        
+        [HttpPost]
+        [Route("editItemOrderFD")]
+        public async Task<IActionResult> editItemToOrderAsync([FromHeader] string token, long itemId, int amount)
+        {
+            string order = await Program.api_addItemOrderFD.editItemOrderFDAsync(token, itemId, amount);
+            if (string.IsNullOrEmpty(order))
+            {
+                return BadRequest();
+            }
+            else
+            {
+                return Ok(order);
+            }
         }
 
         [HttpDelete]
-        [Route("revomeNews")]
-        public async Task<IActionResult> deleteNewsAsync([FromHeader] string token, string code)
+        [Route("deleteItemOrderFD")]
+        public async Task<IActionResult> deleteItemToOrderAsync([FromHeader] string token, long itemId)
         {
-            bool flag = await Program.api_myNews.deleteNewsForAdminAsync(token, code);
-            if (flag)
-            {
-                return Ok();
-            }
-            else
-            {
-                return BadRequest();
-            }
-
-        }
-
-        [HttpPut]
-        [Route("denyNews")]
-        public async Task<IActionResult> denyNewsAsync([FromHeader] string token, string code)
-        {
-            bool flag = await Program.api_myNews.denyNewsForAdminAsync(token, code);
-            if (flag)
-            {
-                return Ok();
-            }
-            else
-            {
-                return BadRequest();
-            }
-
-        }
-
-
-        [HttpGet]
-        [Route("getTotalPriceInDay")]
-        public IActionResult listTotalInDay([FromHeader] string token)
-        {
-            long id = Program.api_userSystem.checkUserSystem(token);
+            long id = Program.api_userSystem.checkAdmin(token);
             if (id >= 0)
             {
-                return Ok(Program.api_orderStadium.getTotalPriceToday(token));
+                bool flag = await Program.api_addItemOrderFD.deleteItemOrderFDAsync(token, itemId);
+                if (flag)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest();
+                }
             }
             else
             {
@@ -493,13 +604,13 @@ namespace BackEnd_Football.Controllers
         }
 
         [HttpGet]
-        [Route("getTotalPriceInMonth")]
-        public IActionResult listTotalInMonth([FromHeader] string token)
+        [Route("listItemOrderFD")]
+        public IActionResult listItemOrderFD(string token, string codeOrder)
         {
             long id = Program.api_userSystem.checkUserSystem(token);
             if (id >= 0)
             {
-                return Ok(Program.api_orderStadium.getTotalPriceMonth(token));
+                return Ok(Program.api_addItemOrderFD.getListItemOrderFD(token, codeOrder));
             }
             else
             {
@@ -507,43 +618,6 @@ namespace BackEnd_Football.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("getTotalOrderInMonth")]
-        public IActionResult listTotalOrderInMonth([FromHeader] string token)
-        {
-            long id = Program.api_userSystem.checkUserSystem(token);
-            if (id >= 0)
-            {
-                return Ok(Program.api_orderStadium.getTotalOrderMonth(token));
-            }
-            else
-            {
-                return Unauthorized();
-            }
-        }
 
-        [HttpGet]
-        [Route("listAllOrderForAdmin")]
-        public IActionResult listAllOrderForAdmin([FromHeader] string token, string time)
-        {
-            DateTime m_time = DateTime.MinValue;
-            try
-            {
-                m_time = DateTime.ParseExact(time, "MM/dd/yyyy", null);
-            }
-            catch (Exception e)
-            {
-                m_time = DateTime.MaxValue;
-            }
-
-            return Ok(Program.api_userSystem.getListAllOrderForAdmin(token, m_time));
-        }
-
-        [HttpGet]
-        [Route("getInfoStadiumForAdmin")]
-        public IActionResult getInfoStadiumForAdmin([FromHeader] string token, string name)
-        {
-            return Ok(Program.api_userSystem.getInfoStadiumForAdmin(token, name));
-        }
     }
 }
