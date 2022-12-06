@@ -1,5 +1,6 @@
 ﻿using BackEnd_Football.Models;
 using Microsoft.EntityFrameworkCore;
+using static BackEnd_Football.Controllers.AdminController;
 
 namespace BackEnd_Football.APIs
 {
@@ -99,18 +100,26 @@ namespace BackEnd_Football.APIs
             }
             using (DataContext context = new DataContext())
             {
+                //SqlUserSystem? sqlUserSystem = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                //if(sqlUserSystem == null)
+                //{
+                //    return false;
+                //}
                 SqlStadium? stadium = context.sqlStadium!.Where(s => s.isDelete == false && s.name.CompareTo(name) == 0).FirstOrDefault();
                 if (stadium != null)
                 {
-                    return false;
+                    stadium = new SqlStadium();
+                    stadium.id = DateTime.Now.Ticks;
+                    stadium.name = name;
+                    stadium.address = address;
+                    stadium.contact = contact;
+                    stadium.price = price;
+                    context.sqlStadium!.Add(stadium);
                 }
-                stadium = new SqlStadium();
-                stadium.id = DateTime.Now.Ticks;
-                stadium.name = name;
-                stadium.address = address;
-                stadium.contact = contact;
-                stadium.price = price;
-                context.sqlStadium!.Add(stadium);
+
+                //m_stadium.address = stadium!.address;
+                //m_stadium.contact = stadium.contact;
+                //m_stadium.price = stadium.price;
 
                 int rows = await context.SaveChangesAsync();
                 if (rows > 0)

@@ -611,6 +611,7 @@ namespace BackEnd_Football.APIs
             public bool chucVu { get; set; } = false;
             public string team { get; set; } = "";
             public string username { get; set; } = "";
+            public string birthday { get; set; } = "";
 
             public int state { get; set; }
         }
@@ -638,6 +639,7 @@ namespace BackEnd_Football.APIs
             temp.chucVu = m_user.ChucVu;
             temp.username = m_user.username;
             temp.state = m_user.SqlState!.code;
+            temp.birthday = m_user.birthday.ToString("MM/dd/yyyy");
             if (m_user.SqlTeam == null)
             {
                 temp.team = "";
