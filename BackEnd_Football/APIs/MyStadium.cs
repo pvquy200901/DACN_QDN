@@ -92,28 +92,34 @@ namespace BackEnd_Football.APIs
             }
         }
 
-        public async Task<bool> editAsync(string token,string name, M_ItemStadium stadium)
+        public async Task<bool> editAsync(string name, string address, string contact, int price)
         {
-            if ( string.IsNullOrEmpty(stadium.address) || string.IsNullOrEmpty(stadium.contact))
+            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(address) || string.IsNullOrEmpty(contact))
             {
                 return false;
             }
             using (DataContext context = new DataContext())
             {
-                SqlUserSystem? sqlUserSystem = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
-                if(sqlUserSystem == null)
+                //SqlUserSystem? sqlUserSystem = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                //if(sqlUserSystem == null)
+                //{
+                //    return false;
+                //}
+                SqlStadium? stadium = context.sqlStadium!.Where(s => s.isDelete == false && s.name.CompareTo(name) == 0).FirstOrDefault();
+                if (stadium != null)
                 {
-                    return false;
-                }
-                SqlStadium? m_stadium = context.sqlStadium!.Where(s => s.isDelete == false && s.name.CompareTo(name) == 0).FirstOrDefault();
-                if (m_stadium == null)
-                {
-                    return false;
+                    stadium = new SqlStadium();
+                    stadium.id = DateTime.Now.Ticks;
+                    stadium.name = name;
+                    stadium.address = address;
+                    stadium.contact = contact;
+                    stadium.price = price;
+                    context.sqlStadium!.Add(stadium);
                 }
 
-                m_stadium.address = stadium!.address;
-                m_stadium.contact = stadium.contact;
-                m_stadium.price = stadium.price;
+                //m_stadium.address = stadium!.address;
+                //m_stadium.contact = stadium.contact;
+                //m_stadium.price = stadium.price;
 
                 int rows = await context.SaveChangesAsync();
                 if (rows > 0)
