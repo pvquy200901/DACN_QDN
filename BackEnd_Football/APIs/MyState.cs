@@ -84,18 +84,6 @@ namespace BackEnd_Football.APIs
                     item.isdeleted = false;
                     context.sqlStates!.Add(item);
                 }
-
-                type = context.sqlStates!.Where(s => s.code == 6).FirstOrDefault();
-                if (type == null)
-                {
-                    SqlState item = new SqlState();
-                    item.ID = DateTime.Now.Ticks;
-                    item.code = 6;
-                    item.name = "Đã từ chối";
-                    item.des = "Đã từ chối";
-                    item.isdeleted = false;
-                    context.sqlStates!.Add(item);
-                }
                 //===================================================
 
                 type = context.sqlStates!.Where(s => s.code == 8).FirstOrDefault();

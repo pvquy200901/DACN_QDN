@@ -18,6 +18,5 @@ namespace BackEnd_Football.Models
         public SqlUserSystem? manager { get; set; }
         public List<Comment> comments { get; set; } = new List<Comment>();
         public SqlState? state { get; set; }
-        public bool isDelete { get; set; } = false;
     }
 }
