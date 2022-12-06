@@ -60,5 +60,12 @@ namespace BackEnd_Football.Controllers
         {
             return Ok(Program.api_groupchat.getListMyChat(token, team));
         }
+
+        [HttpGet]
+        [Route("listAllChatInTeam")]
+        public IActionResult listAllChatInTeam([FromHeader] string token, string team)
+        {
+            return Ok(Program.api_groupchat.getListChatInTeam(token, team));
+        }
     }
 }

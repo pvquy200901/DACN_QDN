@@ -122,5 +122,34 @@ namespace BackEnd_Football.APIs
                 return l_items;
             }
         }
+
+        public List<ItemChat> getListChatInTeam(string token, string team)
+        {
+            using (DataContext context = new DataContext())
+            {
+                List<ItemChat> l_items = new List<ItemChat>();
+
+                SqlUser? m_user = context.users!.Where(s => s.IsDeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if (m_user == null)
+                {
+                    return new List<ItemChat>();
+                }
+
+                List<GroupChat> listChats = context.sqlGroupChat!.Include(s => s.useName).Include(s => s.team).Where(s => s.isDelete == false && s.team!.name.CompareTo(team) == 0)
+                                                              .OrderByDescending(s => s.time).ToList();
+                foreach (GroupChat chats in listChats)
+                {
+                    ItemChat itemChats = new ItemChat();
+                    itemChats.time = chats.time.ToUniversalTime().ToString();
+                    itemChats.chat = chats.chat;
+                    itemChats.userComment = chats.useName!.Name;
+
+                    l_items.Add(itemChats);
+                }
+                return l_items;
+            }
+        }
+
+       
     }
 }
