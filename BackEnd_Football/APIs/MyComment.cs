@@ -129,7 +129,7 @@ namespace BackEnd_Football.APIs
                 SqlUser? m_user = context.users!.Where(s => s.IsDeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
 
                 List<Comment> listComments = context.comments!.Include(s => s.News).Where(s => s.isDelete == false && s.News!.code.CompareTo(news) == 0)
-                                                              .Include(s => s.useComments).ToList();
+                                                              .Include(s => s.useComments).OrderByDescending(s => s.time).ToList();
                 foreach (Comment comments in listComments)
                 {
                     ItemComment itemComments = new ItemComment();
@@ -142,6 +142,8 @@ namespace BackEnd_Football.APIs
                 return l_items;
             }
         }
+
+       
 
 
 
