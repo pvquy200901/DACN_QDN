@@ -20,6 +20,7 @@ public class Program
     public static MyFoodDrink api_foodDrink = new MyFoodDrink();
     public static MyOrderFoodDrink api_orderFD = new MyOrderFoodDrink();
     public static MyItemOrderFoodDrink api_addItemOrderFD = new MyItemOrderFoodDrink();
+    public static MyGroupChat api_groupchat = new MyGroupChat();
 
 
     public static async Task Main(string[] args)
