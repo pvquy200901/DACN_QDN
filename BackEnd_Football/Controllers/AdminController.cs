@@ -376,6 +376,105 @@ namespace BackEnd_Football.Controllers
         }
 
 
+        [HttpGet]
+        [Route("listUser")]
+        public IActionResult listUser([FromHeader] string token)
+        {
+            long id = Program.api_userSystem.checkUserSystem(token);
+            if (id >= 0)
+            {
+                return Ok(Program.api_userSystem.listUserForAdmin(token));
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        [HttpDelete]
+        [Route("revomeUser")]
+        public async Task<IActionResult> deleteUserAsync([FromHeader] string token, string username)
+        {
+
+
+            bool flag = await Program.api_userSystem.removeUser(token, username);
+            if (flag)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
+
+        }
+
+        [HttpDelete]
+        [Route("revomeTeam")]
+        public async Task<IActionResult> deleteTeamAsync([FromHeader] string token, string team)
+        {
+
+
+            bool flag = await Program.api_userSystem.removeTeam(token, team);
+            if (flag)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
+
+        }
+
+        [HttpDelete]
+        [Route("revomeNews")]
+        public async Task<IActionResult> deleteNewsAsync([FromHeader] string token, string code)
+        {
+            bool flag = await Program.api_myNews.deleteNewsForAdminAsync(token, code);
+            if (flag)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
+
+        }
+
+        [HttpPut]
+        [Route("denyNews")]
+        public async Task<IActionResult> denyNewsAsync([FromHeader] string token, string code)
+        {
+            bool flag = await Program.api_myNews.denyNewsForAdminAsync(token, code);
+            if (flag)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
+
+        }
+
+        [HttpPut]
+        [Route("sendEmail")]
+        public async Task<IActionResult> sendEmailAsync(string email)
+        {
+
+            string code = await Program.api_gmail.sendEmailNotification(email);
+            if (string.IsNullOrEmpty(code))
+            {
+                return BadRequest();
+            }
+            else
+            {
+                return Ok(code);
+            }
+        }
+
 
         //==================Tạo order bới quản lí============================================
         [HttpPost]
@@ -392,6 +491,99 @@ namespace BackEnd_Football.Controllers
                 return Ok(order);
             }
         }
+
+        [HttpPut]
+        [Route("confirmOrderStadium")]
+        public async Task<IActionResult> ConfirmOrderStadiumAsync([FromHeader] string token, string code)
+        {
+            bool order = await Program.api_userSystem.confirmOrderSysAsync(token, code);
+            if (order)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpGet]
+        [Route("listConfirmOrder")]
+        public IActionResult listConfirmOrder([FromHeader] string token)
+        {
+
+            return Ok(Program.api_userSystem.getListOrderConfirm(token));
+        }
+
+        [HttpGet]
+        [Route("getTotalPriceInDay")]
+        public IActionResult listTotalInDay([FromHeader] string token)
+        {
+            long id = Program.api_userSystem.checkUserSystem(token);
+            if (id >= 0)
+            {
+                return Ok(Program.api_orderStadium.getTotalPriceToday(token));
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        [HttpGet]
+        [Route("getTotalPriceInMonth")]
+        public IActionResult listTotalInMonth([FromHeader] string token)
+        {
+            long id = Program.api_userSystem.checkUserSystem(token);
+            if (id >= 0)
+            {
+                return Ok(Program.api_orderStadium.getTotalPriceMonth(token));
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        [HttpGet]
+        [Route("getTotalOrderInMonth")]
+        public IActionResult listTotalOrderInMonth([FromHeader] string token)
+        {
+            long id = Program.api_userSystem.checkUserSystem(token);
+            if (id >= 0)
+            {
+                return Ok(Program.api_orderStadium.getTotalOrderMonth(token));
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        [HttpGet]
+        [Route("listAllOrderForAdmin")]
+        public IActionResult listAllOrderForAdmin([FromHeader] string token, string time)
+        {
+            DateTime m_time = DateTime.MinValue;
+            try
+            {
+                m_time = DateTime.ParseExact(time, "MM/dd/yyyy", null);
+            }
+            catch (Exception e)
+            {
+                m_time = DateTime.MaxValue;
+            }
+
+            return Ok(Program.api_userSystem.getListAllOrderForAdmin(token, m_time));
+        }
+
+        [HttpGet]
+        [Route("getInfoStadiumForAdmin")]
+        public IActionResult getInfoStadiumForAdmin([FromHeader] string token, string name)
+        {
+            return Ok(Program.api_userSystem.getInfoStadiumForAdmin(token, name));
+        }
+
         //==================Quản lí food drink============================================
         [HttpPost]
         [Route("createFoodDrink")]

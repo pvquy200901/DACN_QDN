@@ -44,7 +44,7 @@ namespace BackEnd_Football.APIs
                     return "";
                 }
 
-                SqlState? state = context.sqlStates!.Where(s => s.code == 1 && s.isdeleted == false).FirstOrDefault();
+                SqlState? state = context.sqlStates!.Where(s => s.code == 4 && s.isdeleted == false).FirstOrDefault();
                 if (state == null)
                 {
                     return "";

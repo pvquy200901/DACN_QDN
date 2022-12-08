@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using static BackEnd_Football.APIs.MyOrder;
 using System.Globalization;
+using static BackEnd_Football.APIs.MyStadium;
 
 namespace BackEnd_Football.APIs
 {
@@ -503,6 +504,244 @@ namespace BackEnd_Football.APIs
                     return "";
                 }
 
+            }
+        }
+
+        public async Task<bool> confirmOrderSysAsync(string token, string m_order)
+        {
+            using (DataContext context = new DataContext())
+            {
+                SqlUserSystem? user = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if (user == null)
+                {
+                    return false;
+                }
+
+                SqlState? state = context.sqlStates!.Where(s => s.code == 1 && s.isdeleted == false).FirstOrDefault();
+                if (state == null)
+                {
+                    return false;
+                }
+
+                SqlOrderStadium? order = context.sqlOrderStadium!
+                    .Include(s => s.stateOrder)
+                    .Where(s => s.isFinish == false && s.isDelete == false && s.code.CompareTo(m_order) == 0 && s.stateOrder!.code == 4).FirstOrDefault();
+
+               if(order == null)
+                {
+                    return false;
+                }
+
+                order.stateOrder = state;
+              
+                int rows = await context.SaveChangesAsync();
+                if (rows > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+
+            }
+        }
+
+        public List<order> getListOrderConfirm(string token)
+        {
+            using (DataContext context = new DataContext())
+            {
+                List<order> items = new List<order>();
+                SqlUserSystem? user = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if (user == null)
+                {
+                    return new List<order>();
+                }
+                List<SqlOrderStadium> orders = context.sqlOrderStadium!.Include(s => s.stateOrder)
+                                                                        .Where(s => s.isDelete == false && s.stateOrder!.code == 4)
+                                                                        .Include(s => s.stadiumOrder).ToList();
+                foreach (SqlOrderStadium tmp in orders)
+                {
+                    order item = new order();
+                    item.date = tmp.startTime.ToLocalTime().ToString("dd/MM/yyyy");
+                    item.time = tmp.startTime.ToLocalTime().ToString("HH:mm");
+                    item.nameStadium = tmp.stadiumOrder!.name;
+                    item.code = tmp.code;
+                    items.Add(item);
+                }
+                return items;
+            }
+        }
+
+        public List<order> getListAllOrderForAdmin(string token, DateTime time)
+        {
+            using (DataContext context = new DataContext())
+            {
+
+                //DateTime start_time = DateTime.ParseExact(time, "yyyy/MM/dd HH:mm:ss", null);
+                List<order> items = new List<order>();
+                SqlUserSystem? m_user = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if (m_user == null)
+                {
+                    return new List<order>();
+                }
+
+                Console.WriteLine(time);
+
+                List<SqlOrderStadium> orders = context.sqlOrderStadium!
+                                                      .Include(s => s.stateOrder)
+                                                      .Where(s => s.isDelete == false && s.stateOrder!.code == 1 && DateTime.Compare(s.startTime.Date, time.Date) == 0)
+                                                      .Include(s => s.stadiumOrder).ToList();
+                if (orders.Count <= 0)
+                {
+                    return new List<order>();
+                }
+                foreach (SqlOrderStadium tmp in orders)
+                {
+                    order item = new order();
+                    item.date = tmp.startTime.ToLocalTime().ToString("dd/MM/yyyy");
+                    item.time = tmp.startTime.ToLocalTime().ToString("HH:mm");
+                    item.nameStadium = tmp.stadiumOrder!.name;
+                    item.code = tmp.code;
+                    items.Add(item);
+                }
+                return items;
+            }
+        }
+
+
+        public ItemStadium getInfoStadiumForAdmin(string token, string name)
+        {
+            using (DataContext context = new DataContext())
+            {
+                SqlUserSystem? user = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if (user == null)
+                {
+                    return new ItemStadium();
+                }
+
+                SqlStadium? emp = context.sqlStadium!.Where(s => s.isDelete == false && s.name.CompareTo(name) == 0).FirstOrDefault();
+                if (emp == null)
+                {
+                    return new ItemStadium();
+                }
+                ItemStadium item = new ItemStadium();
+                item.name = emp.name;
+                item.address = emp.address;
+                item.contact = emp.contact;
+                item.price = emp.price;
+                if (emp.images != null)
+                {
+                    item.images.AddRange(emp.images);
+                }
+
+                return item;
+            }
+        }
+
+        public class itemUser
+        {
+            public string name { get; set; } = "";
+            public string phone { get; set; } = "";
+            public string email { get; set; } = "";
+            public string birthday { get; set; } = "";
+            public string username { get; set; } = "";
+        }
+        public List<itemUser> listUserForAdmin(string token)
+        {
+            using (DataContext context = new DataContext())
+            {
+
+                SqlUserSystem? admin = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if (admin == null)
+                {
+                    return new List<itemUser>();
+                }
+                List<SqlUser>? m_user = context.users!
+                                                       .Where(s => s.IsDeleted == false)
+                                                       .ToList();
+                if (m_user == null)
+                {
+                    return new List<itemUser>();
+                }
+
+
+                List<itemUser> myUser = new List<itemUser>();
+
+                foreach (SqlUser tmp in m_user)
+                {
+                    itemUser temp = new itemUser();
+                    temp.name = tmp.Name;
+                    temp.phone = tmp.Phone;
+                    temp.email = tmp.Email;
+                    temp.birthday = tmp.birthday.ToLocalTime().ToString("dd/MM/yyyy");
+                    temp.username = tmp.username;
+
+                    myUser.Add(temp);
+                }
+                return myUser;
+            }
+        }
+
+        public async Task<bool> removeUser(string token, string username)
+        {
+            using (DataContext context = new DataContext())
+            {
+                SqlUser? user = context.users!.Where(s => s.IsDeleted == false && s.username.CompareTo(username) == 0)
+                                                .FirstOrDefault();
+                if (user == null)
+                {
+                    return false;
+                }
+                SqlUserSystem? admin = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+
+                if (admin == null)
+                {
+                    return false;
+                }
+
+                user.IsDeleted = true;
+
+                int rows = await context.SaveChangesAsync();
+                if (rows > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
+        public async Task<bool> removeTeam(string token, string team)
+        {
+            using (DataContext context = new DataContext())
+            {
+                SqlTeam? m_team = context.SqlTeams!.Where(s => s.isdeleted == false && s.name.CompareTo(team) == 0)
+                                                .FirstOrDefault();
+                if (m_team == null)
+                {
+                    return false;
+                }
+                SqlUserSystem? admin = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+
+                if (admin == null)
+                {
+                    return false;
+                }
+
+                m_team.isdeleted = true;
+
+                int rows = await context.SaveChangesAsync();
+                if (rows > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
         }
 
