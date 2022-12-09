@@ -356,6 +356,14 @@ namespace BackEnd_Football.Controllers
         }
 
         [HttpGet]
+        [Route("listHistory")]
+        public IActionResult listHistory([FromHeader] string token)
+        {
+
+            return Ok(Program.api_orderStadium.getListHistory(token));
+        }
+
+        [HttpGet]
         [Route("getInfoUser")]
         public IActionResult getInfoUser([FromHeader] string token)
         {

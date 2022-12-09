@@ -118,7 +118,7 @@ namespace BackEnd_Football.Controllers
             long id = Program.api_userSystem.checkUserSystem(token);
             if (id >= 0)
             {
-                return Ok(Program.api_myTeam.getInfoTeam(token, team));
+                return Ok(Program.api_myTeam.getInfoTeamForAdmin(token, team));
             }
             else
             {
@@ -497,6 +497,21 @@ namespace BackEnd_Football.Controllers
         public async Task<IActionResult> ConfirmOrderStadiumAsync([FromHeader] string token, string code)
         {
             bool order = await Program.api_userSystem.confirmOrderSysAsync(token, code);
+            if (order)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpPut]
+        [Route("cancelOrderStadium")]
+        public async Task<IActionResult> CancelOrderStadiumAsync([FromHeader] string token, string code)
+        {
+            bool order = await Program.api_userSystem.cancelOrderSysAsync(token, code);
             if (order)
             {
                 return Ok();

@@ -264,7 +264,33 @@ namespace BackEnd_Football.APIs
                 SqlUser? m_user = context.users!.Where(s => s.IsDeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
                 List<SqlOrderStadium> orders = context.sqlOrderStadium!.Include(s => s.userOrder).Include(s => s.stateOrder)
                                                                         .Where(s => s.isDelete == false && s.userOrder!.token.CompareTo(token) == 0 && s.stateOrder!.code != 11)
-                                                                        .Include(s => s.stadiumOrder).ToList();
+                                                                        .Include(s => s.stadiumOrder)
+                                                                        .OrderByDescending(s => s.startTime)
+                                                                        .ToList();
+                foreach (SqlOrderStadium tmp in orders)
+                {
+                    order item = new order();
+                    item.date = tmp.startTime.ToLocalTime().ToString("dd/MM/yyyy");
+                    item.time = tmp.startTime.ToLocalTime().ToString("HH:mm");
+                    item.nameStadium = tmp.stadiumOrder!.name;
+                    item.code = tmp.code;
+                    items.Add(item);
+                }
+                return items;
+            }
+        }
+
+        public List<order> getListHistory(string token)
+        {
+            using (DataContext context = new DataContext())
+            {
+                List<order> items = new List<order>();
+                SqlUser? m_user = context.users!.Where(s => s.IsDeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                List<SqlOrderStadium> orders = context.sqlOrderStadium!.Include(s => s.userOrder).Include(s => s.stateOrder)
+                                                                        .Where(s => s.isDelete == false && s.userOrder!.token.CompareTo(token) == 0 && s.stateOrder!.code == 1)
+                                                                        .Include(s => s.stadiumOrder)
+                                                                        .OrderByDescending(s => s.startTime)
+                                                                        .ToList();
                 foreach (SqlOrderStadium tmp in orders)
                 {
                     order item = new order();

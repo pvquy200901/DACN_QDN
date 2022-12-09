@@ -415,5 +415,34 @@ namespace BackEnd_Football.APIs
                 return itemTeam;
             }
         }
+
+        public ItemTeam getInfoTeamForAdmin(string token, string code)
+        {
+            using (DataContext context = new DataContext())
+            {
+                SqlUserSystem? user = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if (user == null)
+                {
+                    return new ItemTeam();
+                }
+
+                SqlTeam? emp = context.SqlTeams!.Where(s => s.isdeleted == false && s.name.CompareTo(code) == 0).FirstOrDefault();
+                if (emp == null)
+                {
+                    return new ItemTeam();
+                }
+                ItemTeam itemTeam = new ItemTeam();
+                itemTeam.name = emp.name;
+                itemTeam.shortName = emp.shortName;
+                itemTeam.phone = emp.PhoneNumber;
+                itemTeam.des = emp.des;
+                itemTeam.logo = emp.logo;
+                if (emp.imagesTeam != null)
+                {
+                    itemTeam.imageTeam.AddRange(emp.imagesTeam);
+                }
+                return itemTeam;
+            }
+        }
     }
 }

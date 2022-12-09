@@ -547,6 +547,46 @@ namespace BackEnd_Football.APIs
             }
         }
 
+        public async Task<bool> cancelOrderSysAsync(string token, string m_order)
+        {
+            using (DataContext context = new DataContext())
+            {
+                SqlUserSystem? user = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if (user == null)
+                {
+                    return false;
+                }
+
+                SqlState? state = context.sqlStates!.Where(s => s.code == 6 && s.isdeleted == false).FirstOrDefault();
+                if (state == null)
+                {
+                    return false;
+                }
+
+                SqlOrderStadium? order = context.sqlOrderStadium!
+                    .Include(s => s.stateOrder)
+                    .Where(s => s.isFinish == false && s.isDelete == false && s.code.CompareTo(m_order) == 0 && s.stateOrder!.code == 4).FirstOrDefault();
+
+                if (order == null)
+                {
+                    return false;
+                }
+
+                order.stateOrder = state;
+
+                int rows = await context.SaveChangesAsync();
+                if (rows > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+
+            }
+        }
+
         public List<order> getListOrderConfirm(string token)
         {
             using (DataContext context = new DataContext())
