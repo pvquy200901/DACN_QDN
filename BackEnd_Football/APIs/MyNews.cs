@@ -402,7 +402,7 @@ namespace BackEnd_Football.APIs
             using (DataContext context = new DataContext())
             {
                 List<ItemNewsForAdmin> l_items = new List<ItemNewsForAdmin>();
-                List<SqlNews> listNews = context.sqlNews!.Where(s => s.isDelete == false && s.state!.code == 4).Include(s => s.user).ToList();
+                List<SqlNews> listNews = context.sqlNews!.Where(s => s.isDelete == false && s.state!.code == 4).Include(s => s.user).OrderByDescending(s => s.createdTime).ToList();
                 foreach (SqlNews news in listNews)
                 {
                     ItemNewsForAdmin itemNews = new ItemNewsForAdmin();
@@ -428,7 +428,7 @@ namespace BackEnd_Football.APIs
             using (DataContext context = new DataContext())
             {
                 List<ItemNews> l_items = new List<ItemNews>();
-                List<SqlNews> listNews = context.sqlNews!.Where(s => s.isDelete ==false && s.state!.code == 5).ToList();
+                List<SqlNews> listNews = context.sqlNews!.Where(s => s.isDelete ==false && s.state!.code == 5).OrderByDescending(s => s.createdTime).ToList();
                 foreach (SqlNews news in listNews)
                 {
                     ItemNews itemNews = new ItemNews();
