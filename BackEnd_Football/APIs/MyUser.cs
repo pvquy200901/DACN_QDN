@@ -10,6 +10,8 @@ namespace BackEnd_Football.APIs
         public MyUser()
         {
         }
+       
+
         private string createToken()
         {
             using (DataContext context = new DataContext())
@@ -183,16 +185,16 @@ namespace BackEnd_Football.APIs
                     DateTime time;
                     if (DateTime.TryParse(user.birthday, CultureInfo.CurrentCulture, DateTimeStyles.None, out time))
                     {
-                        m_user.birthday = time.ToUniversalTime();
+                        m_user.birthday = time.ToLocalTime();
                     }
                     else
                     {
-                        m_user.birthday = DateTime.MinValue.ToUniversalTime();
+                        m_user.birthday = DateTime.MinValue.ToLocalTime();
                     }
                 }
                 catch (Exception ex)
                 {
-                    m_user.birthday = DateTime.MinValue.ToUniversalTime();
+                    m_user.birthday = DateTime.MinValue.ToLocalTime();
                 }
 
                 int rows = await context.SaveChangesAsync();
@@ -207,7 +209,7 @@ namespace BackEnd_Football.APIs
             }
         }
 
-        public async Task<bool> createAsync(string token, string name, string shortName,  string address, string phone, string des)
+        public async Task<bool> createAsync(string token, string name, string shortName,  string address, string phone, string des, string level)
         {
             if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(name)  || string.IsNullOrEmpty(phone))
             {
@@ -235,6 +237,8 @@ namespace BackEnd_Football.APIs
                 team.des = des;
                 team.isdeleted = false;
                 team.quantity = 1;
+                team.reputation = 100;
+                team.level = level;
                 team.address = address;
                 team.createdTime = DateTime.Now.ToUniversalTime();
                 team.userCreateTeam = m_user;
@@ -257,7 +261,7 @@ namespace BackEnd_Football.APIs
             }
         }
 
-        public async Task<bool> editAsync(string token, string name, string shortName, int quantity, string address, string phone, string des)
+        public async Task<bool> editAsync(string token, string name, string shortName,  string address, string phone, string des, string level)
         {
             if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(name))
             {
@@ -273,22 +277,24 @@ namespace BackEnd_Football.APIs
                 }
                 if (!String.IsNullOrEmpty(name))
                 {
-                    team!.name = name;
+                    team.name = name;
                 }
                 if (!String.IsNullOrEmpty(shortName))
                 {
-                    team!.shortName = shortName;
+                    team.shortName = shortName;
                 }
                 if (!String.IsNullOrEmpty(des))
                 {
-                    team!.des = des;
+                    team.des = des;
                 }
                 if (!String.IsNullOrEmpty(name))
                 {
-                    team!.name = name;
+                    team.name = name;
                 }
-
-                team!.quantity = quantity;
+                if (!String.IsNullOrEmpty(level))
+                {
+                    team.level = level;
+                }
 
                 if (!String.IsNullOrEmpty(address))
                 {
@@ -301,6 +307,39 @@ namespace BackEnd_Football.APIs
 
                 int rows = await context.SaveChangesAsync();
                 if (rows > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+        public async Task<bool> reportTeam(string token, string team)
+        {
+            using(DataContext context = new DataContext())
+            {
+                SqlUser? m_user = context.users!.Where(s => s.IsDeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if(m_user == null)
+                {
+                    return false;
+                }
+
+                SqlTeam? m_team = context.SqlTeams!.Where(s => s.isdeleted == false && s.name.CompareTo(team) == 0).FirstOrDefault();
+                if(m_team == null)
+                {
+                    return false;
+                }
+                if(m_team.reputation <= 0)
+                {
+                    return false;
+                }
+
+                m_team.reputation = m_team.reputation - 1;
+
+                int row = await context.SaveChangesAsync();
+                if(row > 0)
                 {
                     return true;
                 }
@@ -651,6 +690,142 @@ namespace BackEnd_Football.APIs
 
 
             return temp;
+        }
+
+        public string getAvatarUser (string username)
+        {
+            DataContext context = new DataContext();
+
+            SqlUser? m_user = context.users!.Where(s => s.IsDeleted == false && s.username.CompareTo(username) == 0)
+                                            .Include(s => s.SqlTeam)
+                                            .Include(s => s.SqlState)
+                                            .FirstOrDefault();
+
+            if (m_user == null)
+            {
+                return "";
+            }
+
+            string img = m_user.PhotoURL;
+            return img;
+        }
+
+        public infoUser getInfoUserForAdmin(string username)
+        {
+            DataContext context = new DataContext();
+
+            SqlUser? m_user = context.users!.Where(s => s.IsDeleted == false && s.username.CompareTo(username) == 0)
+                                            .Include(s => s.SqlTeam)
+                                            .Include(s => s.SqlState)
+                                            .FirstOrDefault();
+
+            if (m_user == null)
+            {
+                return new infoUser();
+            }
+
+
+            infoUser temp = new infoUser();
+            temp.name = m_user.Name;
+            temp.avatar = m_user.PhotoURL;
+            temp.email = m_user.Email;
+            temp.phone = m_user.Phone;
+            temp.chucVu = m_user.ChucVu;
+            temp.username = m_user.username;
+            temp.state = m_user.SqlState!.code;
+            if(m_user.birthday == DateTime.MinValue)
+            {
+                temp.birthday = "";
+            }
+            else
+            {
+                temp.birthday = m_user.birthday.ToString("dd/MM/yyyy");
+            }
+           
+            if (m_user.SqlTeam == null)
+            {
+                temp.team = "";
+            }
+            else
+            {
+                temp.team = m_user.SqlTeam!.name;
+            }
+
+
+            return temp;
+        }
+
+        public class itemOrder
+        {
+            public string code { get; set; } = "";
+            public string date { get; set; } = "";
+            public string startTime { get; set; } = "";
+            public string endTime { get; set; } = "";
+            public string price { get; set; } = "";
+            public string nameStadium { get; set; } = "";
+            public string address { get; set; } = "";
+            public string state { get; set; } = "";
+        }
+
+        public List<itemOrder> getListOrderAtTime(string token, string team)
+        {
+            List<itemOrder> list = new List<itemOrder>();
+            DateTime time = DateTime.Now;
+            DateTime begin = new DateTime(time.Year, time.Month, time.Day, 0, 0, 0);
+            DateTime end = begin.AddDays(7);
+            using(DataContext context = new DataContext())
+            {
+                SqlUser? m_user = context.users!.Where(s => s.IsDeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if(m_user == null)
+                {
+                    return new List<itemOrder>();
+                }
+
+                SqlTeam? m_team = context.SqlTeams!.Where(s => s.isdeleted == false && s.name.CompareTo(team) == 0).Include(s => s.user).FirstOrDefault();
+                if(m_team == null)
+                {
+                    return new List<itemOrder>();
+                }
+               /* if(m_team.user != null)
+                {
+                    foreach (SqlUser item in m_team.user)
+                    {
+                        if(item.token.CompareTo(m_user.token) != 0)
+                        {
+                            return new List<itemOrder>();
+                        }
+                    }
+                }*/
+
+                List<SqlOrderStadium>? m_orders = context.sqlOrderStadium!.Include(s => s.stadiumOrder).Include(s => s.stateOrder).Include(s => s.userOrder!).ThenInclude(s => s.SqlTeam)
+                                                .Where(s => s.isDelete == false
+                                                && s.stateOrder!.code == 1
+                                                && s.userOrder!.SqlTeam!.name.CompareTo(m_team.name) == 0 
+                                                && (DateTime.Compare(begin, s.startTime) <= 0
+                                                && DateTime.Compare(end, s.startTime) > 0)).ToList();
+                if(m_orders == null)
+                {
+                    return new List<itemOrder>();
+                }
+
+                foreach (SqlOrderStadium item in m_orders)
+                {
+                    itemOrder tmp = new itemOrder();
+
+                    tmp.code = item.code;
+                    tmp.date = item.startTime.ToLocalTime().ToString("dd-MM-yyyy");
+                    tmp.startTime = item.startTime.ToLocalTime().ToString("HH:mm");
+                    tmp.endTime = item.endTime.ToLocalTime().ToString("HH:mm");
+                    tmp.price = item.price.ToString();
+                    tmp.nameStadium = item.stadiumOrder!.name;
+                    tmp.address = item.stadiumOrder.address;
+                    tmp.state = item.stateOrder!.name;
+
+                    list.Add(tmp);
+                }
+            }
+
+            return list;
         }
     }
 }

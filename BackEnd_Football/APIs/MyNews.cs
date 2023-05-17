@@ -34,8 +34,12 @@ namespace BackEnd_Football.APIs
             public string shortDes { get; set; } = "";
         }
 
-        public async Task<string> createNewsAsync(string token, M_news m_news) 
+        public async Task<string> createNewsAsync(string token, string title, string des, string shortDes, byte[] file) 
         {
+            if (string.IsNullOrEmpty(title))
+            {
+                return "";
+            }
             using (DataContext context = new DataContext())
             {
                 SqlUser? user = context.users!.Where(s => s.IsDeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
@@ -57,27 +61,21 @@ namespace BackEnd_Football.APIs
 
                 SqlNews news = new SqlNews();
                 news.id = DateTime.Now.Ticks;
-                news.title = m_news.title;
-                news.description = m_news.description;
-                news.shortDes = m_news.shortDes;
+                news.title = title;
+                news.description = des;
+                news.shortDes = shortDes;
                 news.code = generatorcode();
                 news.createdTime = DateTime.Now;
 
                 news.state = state;
                 news.user = user;
-                //string img = await Program.api_myFile.saveFileAsync(string.Format("{0}.jpg", DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")), file);
-                //if (string.IsNullOrEmpty(img))
-                //{
-                //    return "";
-                //}
-                //if(news.images == null)
-                //{
-                //    news.images = new List<string>();
-                //}
-                //news.images.Add(img);
-                //news.manager = manager;
-
-                //news.state = context.sqlStates!.Where(s => s.isdeleted == false && s.code == 4).FirstOrDefault();
+                string img = await Program.api_myFile.saveFileAsync(string.Format("{0}.jpg", DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")), file);
+                if (string.IsNullOrEmpty(img))
+                {
+                    return "";
+                }
+                
+                news.images.Add(img);
                 context.sqlNews!.Add(news);
                 int rows = await context.SaveChangesAsync();
                 if (rows > 0)
@@ -351,6 +349,8 @@ namespace BackEnd_Football.APIs
         {
             public string title { get; set; } = "";
             public string description { get; set; } = "";
+            public string user { get; set; } = "";
+            public string username { get; set; } = "";
             public string shortDes { get; set; } = "";
             public string createdTime { get; set; } = "";
             public List<string> imagesNews{ get; set; } = new List<string>();
@@ -361,7 +361,7 @@ namespace BackEnd_Football.APIs
         {
             using (DataContext context = new DataContext())
             {
-                SqlNews? news = context.sqlNews!.Where(s =>  s.code.CompareTo(code) == 0).Include(s => s.state).FirstOrDefault();
+                SqlNews? news = context.sqlNews!.Where(s =>  s.code.CompareTo(code) == 0).Include(s => s.user).Include(s => s.state).FirstOrDefault();
                 if (news == null)
                 {
                     return new ItemInfoNews();
@@ -377,6 +377,8 @@ namespace BackEnd_Football.APIs
                 itemNews.title = news.title;
                 itemNews.description = news.description;
                 itemNews.shortDes = news.shortDes;
+                itemNews.user = news.user!.Name;
+                itemNews.username = news.user!.username;
                 itemNews.createdTime = news.createdTime.ToString();
                 if (news.images != null)
                 {
@@ -389,9 +391,12 @@ namespace BackEnd_Football.APIs
         public class ItemNews
         {
             public string code { get; set; } = "";
+            public string user { get; set; } = "";
             public string title { get; set; } = "";
             public string shortDes { get; set; } = "";
             public string createdTime { get; set; } = "";
+            public string reputation { get; set; } = "";
+            public string image { get; set; } = "";
             public string Time { get; set; } = "";
 
         }
@@ -412,6 +417,7 @@ namespace BackEnd_Football.APIs
                     itemNews.shortDes = news.shortDes;
                     itemNews.createdTime = news.createdTime.ToString();
                     itemNews.user = news.user!.Name;
+
                   /*  if (news.images != null)
                     {
                         itemNews.imagesNews.AddRange(news.images);
@@ -428,14 +434,27 @@ namespace BackEnd_Football.APIs
             using (DataContext context = new DataContext())
             {
                 List<ItemNews> l_items = new List<ItemNews>();
-                List<SqlNews> listNews = context.sqlNews!.Where(s => s.isDelete ==false && s.state!.code == 5).OrderByDescending(s => s.createdTime).ToList();
+                List<SqlNews> listNews = context.sqlNews!.Where(s => s.isDelete ==false && s.state!.code == 5).Include(s => s.user).ThenInclude(s => s.SqlTeam).OrderByDescending(s => s.createdTime).ToList();
                 foreach (SqlNews news in listNews)
                 {
                     ItemNews itemNews = new ItemNews();
                     itemNews.code = news.code;
+                    itemNews.user = news.user!.Name;
                     itemNews.title = news.title;
                     itemNews.shortDes = news.shortDes;
-                    itemNews.createdTime = news.createdTime.ToString();
+                    if(news.images.Count > 0)
+                    {
+                        itemNews.image = news.images[0];
+                    }
+                    else
+                    {
+                        itemNews.image = "";
+                    }
+                    if(news.user!.SqlTeam != null)
+                    {
+                        itemNews.reputation = news.user.SqlTeam.reputation.ToString();
+                    }
+                    itemNews.createdTime = news.createdTime.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss");
                     l_items.Add(itemNews);
                 }
                 return l_items;
@@ -579,7 +598,7 @@ namespace BackEnd_Football.APIs
         {
             using (DataContext context = new DataContext())
             {
-                SqlNews? news = context.sqlNews!.Include(s => s.state).Where(s => s.code.CompareTo(code) == 0 && s.state!.code == 5).FirstOrDefault();
+                SqlNews? news = context.sqlNews!.Include(s => s.state).Where(s => s.code.CompareTo(code) == 0 && s.state!.code == 5).Include(s => s.user).FirstOrDefault();
                 if (news == null)
                 {
                     return new ItemInfoNews();
@@ -593,9 +612,11 @@ namespace BackEnd_Football.APIs
 
                 ItemInfoNews itemNews = new ItemInfoNews();
                 itemNews.title = news.title;
+                itemNews.user = news.user!.Name;
+                itemNews.username = news.user!.username;
                 itemNews.description = news.description;
                 itemNews.shortDes = news.shortDes;
-                itemNews.createdTime = news.createdTime.ToString();
+                itemNews.createdTime = news.createdTime.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss");
                 if (news.images != null)
                 {
                     itemNews.imagesNews.AddRange(news.images);
@@ -626,6 +647,7 @@ namespace BackEnd_Football.APIs
                     ItemNewsForAdmin itemNews = new ItemNewsForAdmin();
                     itemNews.code = news.code;
                     itemNews.title = news.title;
+                    itemNews.user = news.user!.Name;
                     itemNews.shortDes = news.shortDes;
                     itemNews.createdTime = news.createdTime.ToString();
                     itemNews.user = news.user!.Name;

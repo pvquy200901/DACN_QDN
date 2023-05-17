@@ -56,6 +56,39 @@ namespace BackEnd_Football.Migrations
                     b.ToTable("Comment");
                 });
 
+            modelBuilder.Entity("BackEnd_Football.Models.GroupChat", b =>
+                {
+                    b.Property<long>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("id"));
+
+                    b.Property<string>("chat")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("isDelete")
+                        .HasColumnType("boolean");
+
+                    b.Property<long?>("teamid")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("time")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("useNameID")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("teamid");
+
+                    b.HasIndex("useNameID");
+
+                    b.ToTable("groupChat");
+                });
+
             modelBuilder.Entity("BackEnd_Football.Models.ItemOrderFoodDrink", b =>
                 {
                     b.Property<long>("id")
@@ -189,6 +222,9 @@ namespace BackEnd_Football.Migrations
                     b.Property<List<string>>("images")
                         .IsRequired()
                         .HasColumnType("text[]");
+
+                    b.Property<bool>("isDelete")
+                        .HasColumnType("boolean");
 
                     b.Property<long?>("managerID")
                         .HasColumnType("bigint");
@@ -381,6 +417,14 @@ namespace BackEnd_Football.Migrations
                     b.Property<bool>("isFinish")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("latitude")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("longitude")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -460,6 +504,10 @@ namespace BackEnd_Football.Migrations
                     b.Property<bool>("isdeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("level")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("logo")
                         .IsRequired()
                         .HasColumnType("text");
@@ -469,6 +517,9 @@ namespace BackEnd_Football.Migrations
                         .HasColumnType("text");
 
                     b.Property<int>("quantity")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("reputation")
                         .HasColumnType("integer");
 
                     b.Property<string>("shortName")
@@ -611,6 +662,21 @@ namespace BackEnd_Football.Migrations
                     b.Navigation("News");
 
                     b.Navigation("useComments");
+                });
+
+            modelBuilder.Entity("BackEnd_Football.Models.GroupChat", b =>
+                {
+                    b.HasOne("BackEnd_Football.Models.SqlTeam", "team")
+                        .WithMany()
+                        .HasForeignKey("teamid");
+
+                    b.HasOne("BackEnd_Football.Models.SqlUser", "useName")
+                        .WithMany()
+                        .HasForeignKey("useNameID");
+
+                    b.Navigation("team");
+
+                    b.Navigation("useName");
                 });
 
             modelBuilder.Entity("BackEnd_Football.Models.ItemOrderFoodDrink", b =>

@@ -128,6 +128,8 @@ namespace BackEnd_Football.Controllers
 
        
 
+
+
         //[HttpDelete]
         //[Route("clearLogoTeam")]
         //public async Task<IActionResult> clearLogoTeamAsync([FromHeader] string token, string team)
@@ -223,6 +225,8 @@ namespace BackEnd_Football.Controllers
             public string address { get; set; } = "";
             public string contact { get; set; } = "";
             public int price { get; set; }
+            public string latitude { get; set; } = "";
+            public string longtitude { get; set; } = "";
         }
 
         [HttpPost]
@@ -232,7 +236,7 @@ namespace BackEnd_Football.Controllers
             long id = Program.api_userSystem.checkAdmin(token);
             if (id >= 0)
             {
-                bool flag = await Program.api_myStadium.createAsync(token, stadium.name, stadium.address, stadium.contact, stadium.price);
+                bool flag = await Program.api_myStadium.createAsync(token, stadium.name, stadium.address, stadium.contact, stadium.price, stadium.latitude, stadium.longtitude);
                 if (flag)
                 {
                     return Ok();
@@ -255,7 +259,7 @@ namespace BackEnd_Football.Controllers
             long id = Program.api_userSystem.checkAdmin(token);
             if (id >= 0)
             {
-                bool flag = await Program.api_myStadium.editAsync(stadium.name, stadium.address, stadium.contact, stadium.price);
+                bool flag = await Program.api_myStadium.editAsync(stadium.name, stadium.address, stadium.contact, stadium.price, stadium.latitude, stadium.longtitude);
                 if (flag)
                 {
                     return Ok();
@@ -389,6 +393,22 @@ namespace BackEnd_Football.Controllers
             {
                 return Unauthorized();
             }
+        }
+
+        [HttpGet]
+        [Route("getInfoUserForAdmin")]
+        public IActionResult getInfoUserForAdmin([FromHeader] string token, string username)
+        {
+            long id = Program.api_userSystem.checkAdmin(token);
+            if (id >= 0)
+            {
+                return Ok(Program.api_user.getInfoUserForAdmin(username));
+            }
+            else
+            {
+                return Unauthorized();
+            }
+
         }
 
         [HttpDelete]
@@ -553,6 +573,21 @@ namespace BackEnd_Football.Controllers
             if (id >= 0)
             {
                 return Ok(Program.api_orderStadium.getTotalPriceMonth(token));
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        [HttpGet]
+        [Route("getTotalPriceInYear")]
+        public IActionResult listTotalInYear([FromHeader] string token)
+        {
+            long id = Program.api_userSystem.checkUserSystem(token);
+            if (id >= 0)
+            {
+                return Ok(Program.api_orderStadium.getTotalPriceYear(token));
             }
             else
             {

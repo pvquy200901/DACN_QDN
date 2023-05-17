@@ -73,11 +73,9 @@ namespace BackEnd_Football.Controllers
             public string name { get; set; } = "";
             public string shortName { get; set; } = "";
             public string phone { get; set; } = "";
-            public string logo { get; set; } = "";
             public string des { get; set; } = "";
             public string address { get; set; } = "";
-            public int quantity { get; set; }
-            public List<string> imageTeam { get; set; } = new List<string>();
+            public string level { get; set; } = "";
         }
         //Quản lý team
         [HttpPost]
@@ -85,7 +83,7 @@ namespace BackEnd_Football.Controllers
         public async Task<IActionResult> createTeamAsync([FromHeader] string token, ItemHttpTeam team)
         {
 
-            bool flag = await Program.api_user.createAsync(token, team.name, team.shortName, team.address, team.phone, team.des);
+            bool flag = await Program.api_user.createAsync(token, team.name, team.shortName, team.address, team.phone, team.des, team.level);
             if (flag)
             {
                 return Ok();
@@ -96,13 +94,13 @@ namespace BackEnd_Football.Controllers
             }
         }
 
-        [HttpPut]
+        [HttpPost]
         [Route("editTeam")]
         public async Task<IActionResult> editTeamAsync([FromHeader] string token, ItemHttpTeam team)
         {
 
 
-            bool flag = await Program.api_user.editAsync(token, team.name, team.shortName, team.quantity, team.address, team.phone, team.des);
+            bool flag = await Program.api_user.editAsync(token, team.name, team.shortName, team.address, team.phone, team.des, team.level);
             if (flag)
             {
                 return Ok();
@@ -139,6 +137,22 @@ namespace BackEnd_Football.Controllers
 
 
             bool flag = await Program.api_user.joinTeamAsync(token, team);
+            if (flag)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
+
+        }
+
+        [HttpPut]
+        [Route("reportTeam")]
+        public async Task<IActionResult> reportTeamAsync([FromHeader] string token, string team)
+        {
+            bool flag = await Program.api_user.reportTeam(token, team);
             if (flag)
             {
                 return Ok();
@@ -209,6 +223,13 @@ namespace BackEnd_Football.Controllers
         public IActionResult getInfoTeam([FromHeader] string token, string team)
         {
             return Ok(Program.api_myTeam.getInfoTeam(token, team));
+        }
+
+        [HttpGet]
+        [Route("getInfoTeamOfUser")]
+        public IActionResult getInfoTeamOfUser(string username)
+        {           
+                return Ok(Program.api_myTeam.getInfoTeamOfUser(username));        
         }
 
         [HttpGet]
@@ -370,6 +391,8 @@ namespace BackEnd_Football.Controllers
             return Ok(Program.api_user.getInfoUser(token));
         }
 
+       
+
         [HttpGet]
         [Route("getInfoStadium")]
         public IActionResult getInfoStadium([FromHeader] string token, string name)
@@ -384,6 +407,22 @@ namespace BackEnd_Football.Controllers
 
             return Ok(Program.api_myNews.getListNewsForUser(token));
         }
+        [HttpGet]
+        [Route("getAvatarUser")]
+        public IActionResult getAvatarUser(string username)
+        {
+
+            return Ok(Program.api_user.getAvatarUser(username));
+        }
+
+
+        [HttpGet]
+        [Route("getListOrderWithTeam")]
+        public IActionResult getListOrderWithTeam([FromHeader] string token, string team)
+        {
+            return Ok(Program.api_user.getListOrderAtTime(token, team));
+        }
+        
 
     }
 }

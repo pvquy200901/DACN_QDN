@@ -252,6 +252,7 @@ namespace BackEnd_Football.APIs
         public class order
         {
             public string code { get; set; } = "";
+            public string user { get; set; } = "";
             public string date { get; set; } = "";
             public string time { get; set; } = "";
             public string nameStadium { get; set; } = "";
@@ -307,16 +308,12 @@ namespace BackEnd_Football.APIs
         {
             using (DataContext context = new DataContext())
             {
-
-                //DateTime start_time = DateTime.ParseExact(time, "yyyy/MM/dd HH:mm:ss", null);
                 List<order> items = new List<order>();
                 SqlUser? m_user = context.users!.Where(s => s.IsDeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
                 if (m_user == null)
                 {
                     return new List<order>();
                 }
-
-                Console.WriteLine(time);
                 
                 List<SqlOrderStadium> orders = context.sqlOrderStadium!
                                                       .Include(s => s.stateOrder)
@@ -501,6 +498,40 @@ namespace BackEnd_Football.APIs
             return priceToday;
         }
 
+        public float getTotalPriceYear(string token)
+        {
+            float priceToday = 0f;
+            using (DataContext context = new DataContext())
+            {
+                int test = DateTime.Now.Year;
+                Console.WriteLine(test);
+                SqlUserSystem? m_user = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if (m_user == null)
+                {
+                    return 0f;
+                }
+                List<SqlOrderStadium> orders = context.sqlOrderStadium!
+                                                      .Include(s => s.stateOrder)
+                                                      .Where(s => s.isDelete == false && s.stateOrder!.code == 1)
+                                                      .Include(s => s.stadiumOrder).ToList();
+
+                if(orders == null)
+                {
+                    return 0f;
+                }
+                foreach (SqlOrderStadium tmp in orders)
+                {
+                    if(tmp.startTime.Year == test)
+                    {
+                        priceToday += tmp.price;
+                    }
+                }
+
+            }
+            return priceToday;
+        }
+
+
         public int getTotalOrderMonth(string token)
         {
             int orderMonth = 0;
@@ -653,6 +684,90 @@ namespace BackEnd_Football.APIs
             }
         }
 
+        public class orderUser
+        {
+            public string code { get; set; } = "";
+            public string date { get; set; } = "";
+            public string startTime { get; set; } = "";
+            public string endTime { get; set; } = "";
+            public string price { get; set; } = "";
+            public string state { get; set; } = "";
+            public string nameStadium { get; set; } = "";
+            public string address { get; set; } = "";
+        }
+
+        public List<orderUser> getListInfoOrderForUser(string token)
+        {
+            using(DataContext context = new DataContext())
+            {
+                List<orderUser> list = new List<orderUser>();
+                SqlUser? m_user = context.users!.Where(s => s.IsDeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if(m_user == null)
+                {
+                    return new List<orderUser>();
+                }
+
+                List<SqlOrderStadium>? m_orders = context.sqlOrderStadium!.Include(s => s.userOrder).Where(s => s.isDelete == false && s.userOrder!.username.CompareTo(m_user.username) == 0).Include(s => s.stateOrder).Include(s => s.stadiumOrder).OrderByDescending(s => s.startTime).ToList();
+                if(m_orders == null)
+                {
+                    return new List<orderUser>();
+                }
+                foreach (SqlOrderStadium tmp in m_orders)
+                {
+                    orderUser item = new orderUser();
+                    item.code = tmp.code;
+                    item.date = tmp.startTime.ToLocalTime().ToString("dd-MM-yyyy");
+                    item.startTime = tmp.startTime.ToLocalTime().ToString("HH:mm");
+                    item.endTime = tmp.endTime.ToLocalTime().ToString("HH:mm");
+                    item.price = tmp.price.ToString();
+                    item.state = tmp.stateOrder!.name;
+                    item.nameStadium = tmp.stadiumOrder!.name;
+                    item.address = tmp.stadiumOrder!.address;
+                    list.Add(item);
+                }
+                return list;
+            }
+        }
+
+        public List<order> getListAllOrderUser(string token, DateTime time, string name)
+        {
+            using (DataContext context = new DataContext())
+            {
+
+                List<order> items = new List<order>();
+                SqlUser? m_user = context.users!.Where(s => s.IsDeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if (m_user == null)
+                {
+                    return new List<order>();
+                }
+
+                SqlStadium? m_stadium = context.sqlStadium!.Where(s => s.isDelete == false && s.name.CompareTo(name) == 0).FirstOrDefault();
+                if(m_stadium == null)
+                {
+                    return new List<order>();
+                }
+
+                List<SqlOrderStadium> orders = context.sqlOrderStadium!
+                                                      .Include(s => s.stateOrder).Include(s => s.stadiumOrder)
+                                                      .Where(s => s.isDelete == false && s.stateOrder!.code == 1 && DateTime.Compare(s.startTime.Date, time.Date) == 0 && s.stadiumOrder!.name.CompareTo(name) == 0)
+                                                      .Include(s => s.userOrder)
+                                                      .ToList();
+                if (orders.Count <= 0)
+                {
+                    return new List<order>();
+                }
+                foreach (SqlOrderStadium tmp in orders)
+                {
+                    order item = new order();
+                    item.date = tmp.startTime.ToLocalTime().ToString("dd/MM/yyyy");
+                    item.time = tmp.startTime.ToLocalTime().ToString("HH:mm");
+                    item.nameStadium = tmp.stadiumOrder!.name;
+                    item.code = tmp.code;
+                    items.Add(item);
+                }
+                return items;
+            }
+        }
 
     }
     

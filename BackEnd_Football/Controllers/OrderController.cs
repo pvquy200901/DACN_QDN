@@ -129,5 +129,31 @@ namespace BackEnd_Football.Controllers
 
             return Ok(Program.api_orderStadium.getListOrderFinishedInDay(token));
         }
+
+        [HttpGet]
+        [Route("getListInfoOrderForUser")]
+        public IActionResult getListInfoOrderForUser([FromHeader] string token)
+        {
+
+
+            return Ok(Program.api_orderStadium.getListInfoOrderForUser(token));
+        }
+
+        [HttpGet]
+        [Route("listAllOrderUser")]
+        public IActionResult listAllOrderUser([FromHeader] string token, string time, string stadium)
+        {
+            DateTime m_time = DateTime.MinValue;
+            try
+            {
+                m_time = DateTime.ParseExact(time, "dd/MM/yyyy", null);
+            }
+            catch (Exception e)
+            {
+                m_time = DateTime.MaxValue;
+            }
+
+            return Ok(Program.api_orderStadium.getListAllOrderUser(token, m_time, stadium));
+        }
     }
 }

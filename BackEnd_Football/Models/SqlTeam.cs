@@ -11,6 +11,8 @@ namespace BackEnd_Football.Models
         public string name { get; set; } = "";
         public string shortName { get; set; } = "";
         public string logo { get; set; } = "";
+        public int reputation { get; set; } = 0;
+        public string level { get; set; } = "";
         public DateTime createdTime { get; set; }
         public int quantity { get; set; } = 0;
         public string address { get; set; } = "";

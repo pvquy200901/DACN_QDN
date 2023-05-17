@@ -22,6 +22,8 @@ namespace BackEnd_Football.APIs
                     item.contact = "0336789234";
                     item.isDelete = false;
                     item.isFinish = false;
+                    item.latitude = "10.883615";
+                    item.longitude = "106.780693";
                     item.price = 350000;
                     item.createdTime = DateTime.Now.ToUniversalTime();
                     context.sqlStadium!.Add(item);
@@ -37,6 +39,8 @@ namespace BackEnd_Football.APIs
                     item.contact = "0336789234";
                     item.isDelete = false;
                     item.isFinish = false;
+                    item.latitude = "10.885473";
+                    item.longitude = "106.786266";
                     item.price = 350000;
                     item.createdTime = DateTime.Now.ToUniversalTime();
                     context.sqlStadium!.Add(item);
@@ -46,9 +50,9 @@ namespace BackEnd_Football.APIs
             }
         }
 
-        public async Task<bool> createAsync(string token, string name, string address, string contact, int price)
+        public async Task<bool> createAsync(string token, string name, string address, string contact, int price, string latitude, string longtitude)
         {
-            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(address) || string.IsNullOrEmpty(contact))
+            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(address) || string.IsNullOrEmpty(contact) || string.IsNullOrEmpty(latitude) || string.IsNullOrEmpty(longtitude))
             {
                 return false;
             }
@@ -74,6 +78,8 @@ namespace BackEnd_Football.APIs
                 stadium.name = name;
                 stadium.address = address;
                 stadium.contact = contact;
+                stadium.latitude = latitude;
+                stadium.longitude = longtitude;
                 stadium.price = price;
                 stadium.createdTime = DateTime.Now.ToUniversalTime();
                 stadium.state = state;
@@ -92,12 +98,9 @@ namespace BackEnd_Football.APIs
             }
         }
 
-        public async Task<bool> editAsync(string name, string address, string contact, int price)
+        public async Task<bool> editAsync(string name, string address, string contact, int price, string latitude, string longtitude)
         {
-            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(address) || string.IsNullOrEmpty(contact))
-            {
-                return false;
-            }
+            
             using (DataContext context = new DataContext())
             {
                 //SqlUserSystem? sqlUserSystem = context.sqlUserSystems!.Where(s => s.isdeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
@@ -106,20 +109,33 @@ namespace BackEnd_Football.APIs
                 //    return false;
                 //}
                 SqlStadium? stadium = context.sqlStadium!.Where(s => s.isDelete == false && s.name.CompareTo(name) == 0).FirstOrDefault();
-                if (stadium != null)
+                
+                if(stadium == null)
                 {
-                    stadium = new SqlStadium();
-                    stadium.id = DateTime.Now.Ticks;
-                    stadium.name = name;
-                    stadium.address = address;
-                    stadium.contact = contact;
-                    stadium.price = price;
-                    context.sqlStadium!.Add(stadium);
+                    return false;
                 }
 
-                //m_stadium.address = stadium!.address;
-                //m_stadium.contact = stadium.contact;
-                //m_stadium.price = stadium.price;
+                if (!string.IsNullOrEmpty(address))
+                {
+                    stadium.address = address;
+                }
+                if (!string.IsNullOrEmpty(contact))
+                {
+                    stadium.contact = contact;
+                }
+                if (!string.IsNullOrEmpty(price.ToString()))
+                {
+                    stadium.price = price;
+                }
+                if (!string.IsNullOrEmpty(latitude))
+                {
+                    stadium.latitude = latitude;
+                }
+                if (!string.IsNullOrEmpty(longtitude))
+                {
+                    stadium.longitude = longtitude;
+                }
+               
 
                 int rows = await context.SaveChangesAsync();
                 if (rows > 0)
@@ -241,6 +257,8 @@ namespace BackEnd_Football.APIs
             public string name { get; set; } = "";
             public string address { get; set; } = "";
             public string contact { get; set; } = "";
+            public string latitude { get; set; } = "";
+            public string longtitude { get; set; } = "";
             public float price { get; set; }
             public List<string> images { get; set; } = new List<string>();
         }
@@ -258,6 +276,8 @@ namespace BackEnd_Football.APIs
                     item.address = stadium.address;
                     item.contact = stadium.contact;
                     item.price = stadium.price;
+                    item.latitude = stadium.latitude;
+                    item.longtitude = stadium.longitude;
                     if (stadium.images != null)
                     {
                         item.images.AddRange(stadium.images);
@@ -282,6 +302,8 @@ namespace BackEnd_Football.APIs
                     item.address = stadium.address;
                     item.contact = stadium.contact;
                     item.price = stadium.price;
+                    item.latitude = stadium.latitude;
+                    item.longtitude = stadium.longitude;
                     if (stadium.images != null)
                     {
                         item.images.AddRange(stadium.images);
@@ -313,6 +335,8 @@ namespace BackEnd_Football.APIs
                 item.address = emp.address;
                 item.contact = emp.contact;
                 item.price = emp.price;
+                item.latitude = emp.latitude;
+                item.longtitude = emp.longitude;
                 if (emp.images != null)
                 {
                     item.images.AddRange(emp.images);

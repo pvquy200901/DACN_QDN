@@ -11,7 +11,7 @@ namespace BackEnd_Football.APIs
         {
             using (DataContext context = new DataContext())
             {
-                SqlTeam? team = context.SqlTeams!.Where(s => s.name.CompareTo("TestTeam1") == 0).FirstOrDefault();
+               /* SqlTeam? team = context.SqlTeams!.Where(s => s.name.CompareTo("TestTeam1") == 0).FirstOrDefault();
                 if (team == null)
                 {
                     SqlTeam item = new SqlTeam();
@@ -19,8 +19,10 @@ namespace BackEnd_Football.APIs
                     item.name = "TestTeam1";
                     item.shortName = "TT1";
                     item.logo = "";
+                    item.reputation = 100;
+                    item.level = "1";
                     item.createdTime = DateTime.Now.ToUniversalTime();
-                    item.quantity = 15;
+                    item.quantity = 0;
                     item.address = "Thu Duc, Tp. Ho Chi Minh";
                     item.imagesTeam = new List<string>();
                     item.des = "";
@@ -45,7 +47,7 @@ namespace BackEnd_Football.APIs
                     item.PhoneNumber = "0336789123";
                     item.isdeleted = false;
                     context.SqlTeams!.Add(item);
-                }
+                }*/
 
                 int rows = await context.SaveChangesAsync();
             }
@@ -334,6 +336,8 @@ namespace BackEnd_Football.APIs
             public string logo { get; set; } = "";
             public string des { get; set; } = "";
             public string address { get; set; } = "";
+            public string level { get; set; } = "";
+            public int reputation { get; set; }
             public int quality { get; set; }
             public List<string> imageTeam { get; set; } = new List<string>();
         }
@@ -354,6 +358,8 @@ namespace BackEnd_Football.APIs
                     item.des = team.des;
                     item.quality = team.quantity;
                     item.address = team.address;
+                    item.level = team.level;
+                    item.reputation = team.reputation;
                     if (team.imagesTeam != null)
                     {
                         item.imageTeam.AddRange(team.imagesTeam);
@@ -408,6 +414,11 @@ namespace BackEnd_Football.APIs
                 itemTeam.phone = emp.PhoneNumber;
                 itemTeam.des = emp.des;
                 itemTeam.logo = emp.logo;
+                itemTeam.address = emp.address;
+                itemTeam.quality = emp.quantity;
+                itemTeam.level = emp.level;
+                itemTeam.reputation = emp.reputation;
+                
                 if (emp.imagesTeam != null)
                 {
                     itemTeam.imageTeam.AddRange(emp.imagesTeam);
@@ -437,11 +448,77 @@ namespace BackEnd_Football.APIs
                 itemTeam.phone = emp.PhoneNumber;
                 itemTeam.des = emp.des;
                 itemTeam.logo = emp.logo;
+                itemTeam.address = emp.address;
+                itemTeam.quality = emp.quantity;
                 if (emp.imagesTeam != null)
                 {
                     itemTeam.imageTeam.AddRange(emp.imagesTeam);
                 }
                 return itemTeam;
+            }
+        }
+        public ItemTeam getInfoTeamOfUser(string username)
+        {
+            using (DataContext context = new DataContext())
+            {
+                SqlUser? user = context.users!.Where(s => s.IsDeleted == false && s.username.CompareTo(username) == 0).Include(s => s.SqlTeam).FirstOrDefault();
+                if (user == null)
+                {
+                    return new ItemTeam();
+                }
+
+
+                ItemTeam itemTeam = new ItemTeam();
+
+                if (user.SqlTeam != null)
+                {
+                    itemTeam.name = user.SqlTeam.name;
+                    itemTeam.shortName = user.SqlTeam.shortName;
+                    itemTeam.phone = user.SqlTeam.PhoneNumber;
+                    itemTeam.des = user.SqlTeam.des;
+                    itemTeam.logo = user.SqlTeam.logo;
+                    itemTeam.address = user.SqlTeam.address;
+                    itemTeam.quality = user.SqlTeam.quantity;
+                    itemTeam.level = user.SqlTeam.level;
+                    itemTeam.reputation = user.SqlTeam.reputation;
+
+                    if (user.SqlTeam.imagesTeam != null)
+                    {
+                        itemTeam.imageTeam.AddRange(user.SqlTeam.imagesTeam);
+                    }
+                }
+                
+                return itemTeam;
+            }
+        }
+
+        public async Task<bool> reportTeam(string token, string team)
+        {
+            using(DataContext context = new DataContext())
+            {
+                SqlUser? m_user = context.users!.Where(s => s.IsDeleted == false && s.token.CompareTo(token) == 0).FirstOrDefault();
+                if(m_user == null)
+                {
+                    return false;
+                }
+
+                SqlTeam? m_team = context.SqlTeams!.Where(s => s.isdeleted == false && s.name.CompareTo(team) == 0).FirstOrDefault();
+                if(m_team == null)
+                {
+                    return false;
+                }
+
+                m_team.reputation -= 1;
+
+                int rows = await context.SaveChangesAsync();
+                if(rows > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
         }
     }

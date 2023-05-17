@@ -119,6 +119,7 @@ namespace BackEnd_Football.APIs
             public string time { get; set; } = "";
             public string comment { get; set; } = "";
             public string userComment { get; set; } = "";
+            public string avatarUser { get; set; } = "";
         }
         public List<ItemComment> getListNewsInNews(string token, string news)
         {
@@ -136,6 +137,7 @@ namespace BackEnd_Football.APIs
                     itemComments.time = comments.time.ToUniversalTime().ToString();
                     itemComments.comment = comments.comments;
                     itemComments.userComment = comments.useComments!.Name;
+                    itemComments.avatarUser = comments.useComments!.PhotoURL;
                    
                     l_items.Add(itemComments);
                 }

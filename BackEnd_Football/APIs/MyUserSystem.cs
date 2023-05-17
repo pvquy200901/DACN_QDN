@@ -599,13 +599,15 @@ namespace BackEnd_Football.APIs
                 }
                 List<SqlOrderStadium> orders = context.sqlOrderStadium!.Include(s => s.stateOrder)
                                                                         .Where(s => s.isDelete == false && s.stateOrder!.code == 4)
-                                                                        .Include(s => s.stadiumOrder).ToList();
+                                                                        .Include(s => s.stadiumOrder)
+                                                                        .Include(s => s.userOrder).ToList();
                 foreach (SqlOrderStadium tmp in orders)
                 {
                     order item = new order();
                     item.date = tmp.startTime.ToLocalTime().ToString("dd/MM/yyyy");
                     item.time = tmp.startTime.ToLocalTime().ToString("HH:mm");
                     item.nameStadium = tmp.stadiumOrder!.name;
+                    item.user = tmp.userOrder!.Name;
                     item.code = tmp.code;
                     items.Add(item);
                 }
@@ -648,6 +650,8 @@ namespace BackEnd_Football.APIs
                 return items;
             }
         }
+
+
 
 
         public ItemStadium getInfoStadiumForAdmin(string token, string name)
@@ -785,5 +789,6 @@ namespace BackEnd_Football.APIs
             }
         }
 
+       
     }
 }

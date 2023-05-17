@@ -16,10 +16,12 @@ namespace BackEnd_Football.Controllers
 
         [HttpPost]
         [Route("createNews")]
-        public async Task<IActionResult> createNewsAsync([FromHeader] string token, M_news m_News)
+        public async Task<IActionResult> createNewsAsync([FromHeader] string token, string title, string des, string shortDes, IFormFile image)
         {
-           
-                string code = await Program.api_myNews.createNewsAsync(token, m_News);
+            using (MemoryStream ms = new MemoryStream())
+            {
+                image.CopyTo(ms);
+                string code = await Program.api_myNews.createNewsAsync(token, title, des, shortDes, ms.ToArray());
                 if (string.IsNullOrEmpty(code))
                 {
                     return BadRequest();
@@ -28,7 +30,8 @@ namespace BackEnd_Football.Controllers
                 {
                     return Ok(code);
                 }
-            
+            }
+
         }
 
         [HttpPost]

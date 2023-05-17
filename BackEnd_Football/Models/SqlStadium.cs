@@ -10,6 +10,8 @@ namespace BackEnd_Football.Models
         public long id { get; set; }
         public string name { get; set; } = "";
         public string address { get; set; } = "";
+        public string latitude { get; set; } = "";
+        public string longitude { get; set; } = "";
         public string contact { get; set; } = "";
         public List<string> images { get; set; } = new List<string>();
         public bool isFinish { get; set; } = false;
